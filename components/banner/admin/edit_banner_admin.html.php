@@ -46,14 +46,18 @@ $banner_category = JRequest::getInt('banner_category');
 
 </form>
 
+
+<?php //ONLY SHOW UP IF EDITING!!!
+if (JRequest::getCmd('edit'))
+{ ?>
+
 <br/><br/>VARNING! Annonsen raderas permanent!
 <form action="<?php echo $returnURL; ?>" method="post">
-<?php 
-		if (JRequest::getCmd('edit'))
-		{
-			echo '<input type="hidden" name="id" value="'.JRequest::getInt('id').'" />';
-			echo '<input type="submit" name="remove" value="'.REMOVE_BANNER.'" />';
-		}
-?></form>
+	<input type="hidden" name="id" value="<?php echo JRequest::getInt('id'); ?>" />
+	<input type="submit" name="remove" value="<?php echo REMOVE_BANNER; ?>" />
+</form>
+
+<?php } ?>
+
 
 

@@ -6,6 +6,9 @@ defined('BANNER') or die('Restricted access');
 //Predefine commonly used variables
 $banner_id = JRequest::getInt('id');
 $bannerEditURL = "index.php?option=com_eventlist&task=edit_banner&id=".$banner_id;
+
+$categoryType = BannerActions::getBannerCategoryType($banner_id);
+
 ?>
 
 <?php 
@@ -23,16 +26,26 @@ $bannerEditURL = "index.php?option=com_eventlist&task=edit_banner&id=".$banner_i
 </form>
 <br />
 
+
 <!-- EDIT DAILY TEXT SETTINGS -->
 <?php 
-	BannerActions::showEditBannerText();
-?><?php 
-$currentMonth = date("n");
-$displayedMonth = JRequest::getInt("m", $currentMonth, "&nbsp;");
+	BannerActions::showEditBannerText($categoryType);
+?>
 
-$currentYear = date("Y");
-$displayedYear = JRequest::getInt("Y", $currentYear);
-
-BannerActions::showMonthSelector($bannerEditURL, $displayedMonth, $displayedYear);
-BannerActions::showBannerTextTableByMonth($banner_id, $displayedMonth, $displayedYear, $bannerEditURL);
+<?php 
+	//Show a different banner list depending on category!
+	
+	if ($categoryType == CTYPE_SINGLE)
+	{
+		require(BANNER.DS.'edit_banner_textlist_single.html.php'); 
+	}
+	elseif ($categoryType == CTYPE_SPAN)
+	{
+		require(BANNER.DS.'edit_banner_textlist_span.html.php'); 
+	}
+	else
+	{
+		//By default, list used banners
+		require(BANNER.DS.'edit_banner_textlist_span.html.php'); 
+	}
 ?>

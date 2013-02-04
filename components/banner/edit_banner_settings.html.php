@@ -14,6 +14,9 @@ $price_text			= JRequest::getVar('price_text', "");
 $time_text			= JRequest::getVar('time_text', "");
 $date_text 			= JRequest::getVar('date_text', "") . " " . strftime(JRequest::getVar('date_format', SAMPLE_DATE_TEXT_DATEFORMAT));
 
+$lhead_text = "";
+if (BannerActions::getBannerCategoryType($banner_id) == CAT_LUNCHGUIDEN)
+	{ $lhead_text = SAMPLE_LHEAD_TEXT; }
 
 $main_text 	= JRequest::getVar('main_text', SAMPLE_MAIN_TEXT);
 $sub_text 	= JRequest::getVar('sub_text', 	SAMPLE_SUB_TEXT);
@@ -23,7 +26,7 @@ $sub_text 	= JRequest::getVar('sub_text', 	SAMPLE_SUB_TEXT);
 <?php 
     //Show the banner - with applied settings
     require_once(JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner'.DS.'banner.php');
-    Banner::displayCustomBanner($main_text, $sub_text, $price_text, $time_text, $date_text, $banner_url, $background_image); //Show with sample text
+    Banner::displayCustomBanner($main_text, $sub_text, $price_text, $time_text, $date_text, $lhead_text, $banner_url, $background_image); //Show with sample text
 ?>
 
 
