@@ -27,13 +27,18 @@ class Banner
         if($user->usertype == "Super Administrator" || $user->usertype == "Administrator")
             { $admin = true; }
 
+        /* For now, it is better to REQUIRE there to be a category!
         $bannersArray;
 
         if ($categoryID)
         	{ $bannersArray = BannerDatabase::getActiveBannersByCategory($categoryID); }
         else
         	{ $bannersArray = BannerDatabase::getActiveBanners(); }        	
-        	
+       	*/
+        
+        
+        $bannersArray = BannerDatabase::getActiveBannersByCategory($categoryID);
+            
 
         // Import CSS
         echo '<link rel="stylesheet" type="text/css" href="'.BANNER_CSS.'" />';
@@ -42,10 +47,11 @@ class Banner
         {
             $text = BannerDatabase::getBannerTodayText($banner->id);
 
-            if ($text && strlen($text->lunch_text))
+            if ($text && strlen($text->main_text))
             {
-            	$date_text = strftime(DATEFORMAT_TIME_TEXT); //NOW by default
-                Banner::showBanner($text->lunch_text, $text->altlunch_text, $banner->price_text, $banner->time_text, $date_text, $banner->site_url, $banner->background_image, $banner->name);
+            	//$date_text = strftime(DATEFORMAT_TIME_TEXT); //NOW by default
+    			$date_text = $banner->date_text . " " . strftime($banner->date_format);
+                Banner::showBanner($text->main_text, $text->sub_text, $banner->price_text, $banner->time_text, $date_text, $banner->site_url, $banner->background_image, $banner->name);
 
                 //Show edit button if current owner or administrator
                 if ($admin || ($user->id == $banner->owner))
@@ -71,7 +77,7 @@ class Banner
         echo '</div>';
     }
 
-    static function displayBannerByID($bannerID, $lunch_text = "", $altlunch_text = "", $date_text = "")
+    static function displayBannerByID($bannerID, $main_text = "", $sub_text = "", $date_text = "", $date_format = "")
     {
         //Import the databse
         require_once(JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner'.DS.'banner.db.php');
@@ -80,36 +86,43 @@ class Banner
 
         if ($banner)
         {
-        	if ((!strlen($lunch_text)) && (!strlen($altlunch_text)))
+        	if ((!strlen($main_text)) && (!strlen($sub_text)))
         	{
-        		$lunch_text = SAMPLE_LUNCH_TEXT;
-        		$altlunch_text = SAMPLE_ALTLUNCH_TEXT;
+        		$main_text = SAMPLE_MAIN_TEXT;
+        		$sub_text =  SAMPLE_SUB_TEXT;
         	}
         	
         	if (!strlen($date_text))
-        		{ $date_text = strftime(DATEFORMAT_TIME_TEXT); } //NOW by default
+        	{
+        		if (!strlen($date_format))
+	        		{ $date_format = $banner->date_format; }
+	        		
+        		//$date_text = strftime(SAMPLE_DATE_TEXT_DATEFORMAT); 
+        		$date_text = $banner->date_text . " " . strftime($date_format); 
+        	} 
         	
-       		Banner::displayCustomBanner($lunch_text, $altlunch_text, $banner->price_text, $banner->time_text, $date_text, $banner->site_url, $banner->background_image, $banner->name);
+       		Banner::displayCustomBanner($main_text, $sub_text, $banner->price_text, $banner->time_text, $date_text, $banner->site_url, $banner->background_image, $banner->name);
         }
     }
     
     
     //Excludes the edit button ETC or any database access
-    public static function displayCustomBanner($lunch_text, $altlunch_text, $price_text, $time_text, $date_text, $site_url, $background_image, $image_alt = "")
+    public static function displayCustomBanner($main_text, $sub_text, $price_text, $time_text, $date_text, $site_url, $background_image, $image_alt = "")
     {
     	// Import CSS
         echo '<link rel="stylesheet" type="text/css" href="'.BANNER_CSS.'" />';
     	echo '<div id="dagens_container">';
-		Banner::showBanner($lunch_text, $altlunch_text, $price_text, $time_text, $date_text, $site_url, $background_image, $image_alt);
+		Banner::showBanner($main_text, $sub_text, $price_text, $time_text, $date_text, $site_url, $background_image, $image_alt);
 		echo '</div>';
     }
     
 
-
-    static function showBanner($lunch_text, $altlunch_text, $price_text, $time_text, $date_text, $site_url, $background_image, $image_alt = "")
+	
+    //Displays the RAW banner, with no div or edit buttons
+    static function showBanner($main_text, $sub_text, $price_text, $time_text, $date_text, $site_url, $background_image, $image_alt = "")
     {
     	//Now, make it into a giant link!!
-    	echo '<a href="'.$site_url.'">';
+    	echo '<a target="_blank" href="'.$site_url.'">';
     	
     	echo '<table class="dagens" cellpadding="0" cellspacing="0">';
 		echo '<tr class="head">';
@@ -122,14 +135,14 @@ class Banner
 			echo '<td class="spacer">&nbsp;</td>';
 			echo '<td><img src="'.BANNER_IMAGE_ROOT_URL.$background_image.'" alt="'.Banner::makeHTML($image_alt).'" class="dagens" /></td>';
 			echo '<td>';
-				echo '<h1>'.Banner::makeHTML($lunch_text).'</h1>';
-				echo '<h2>'.Banner::makeHTML($altlunch_text).'</h2>';
+				echo '<h1 class="dagens">'.Banner::makeHTML($main_text).'</h1>';
+				echo '<h6 class="dagens">'.Banner::makeHTML($sub_text).'</h2>';
 			echo '</td>';
 			echo '<td class="spacer">&nbsp;</td>';
 		echo '</tr>';
 		echo '<tr class="footer">';
 			echo '<td class="spacer">&nbsp;</td>';
-			echo '<td class="left_footer">'.Banner::makeHTML(PREFIX_TIME_TEXT.$time_text).'</td>';
+			echo '<td class="left_footer">'.Banner::makeHTML($time_text).'</td>';
 			echo '<td class="right_footer">'.Banner::makeHTML($price_text).'</td>';
 			echo '<td class="spacer">&nbsp;</td>';
 		echo '</tr>';

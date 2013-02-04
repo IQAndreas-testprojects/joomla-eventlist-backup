@@ -13,7 +13,7 @@ $bannerEditURL = "index.php?option=com_eventlist&task=edit_banner&id=".$banner_i
     //The problem is, now I am retrieving the banner information TWICE.
     //Overkill, but oh well...
     require_once(JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner'.DS.'banner.php');
-    Banner::displayBannerByID($banner_id, JRequest::getString('lunch_text', SAMPLE_LUNCH_TEXT), JRequest::getString('altlunch_text', SAMPLE_ALTLUNCH_TEXT), JRequest::getString('date_text', "")); //Show with sample text
+    Banner::displayBannerByID($banner_id, JRequest::getString('main_text', SAMPLE_MAIN_TEXT), JRequest::getString('sub_text', SAMPLE_SUB_TEXT), JRequest::getString('date_text', ""), JRequest::getString('date_format')); //Show with sample text
 ?>
 <!-- EDIT BANNER SETTINGS -->
 <br />

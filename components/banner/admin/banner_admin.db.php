@@ -1,8 +1,4 @@
 <?php
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 //Avoids typing out "mysql_real_escape_string" 20 times in a row. ;)
 function clean($str)
@@ -78,13 +74,13 @@ class BannerAdminDatabase
     }
     
     //Set the `price_text` and `time_text` default values separately
-    public static function addBanner($name, $owner, $category, $background_image = "", $site_url = "", $enabled = 1)
+    public static function addBanner($name, $owner, $category, $date_text = "", $background_image = "", $site_url = "", $enabled = 1)
     {
         $db =& JFactory::getDBO();
 
         $query = "INSERT INTO `#__eventlist_banners` ";
-        $query .= "(`name`, `owner`, `enabled`, `category`, `background_image`, `site_url`) ";
-        $query .= "VALUES ('".clean($name)."', '".intval($owner)."', '".intval($enabled)."' , '".intval($category)."' , '".clean($background_image)."', '".clean($site_url)."'); ";
+        $query .= "(`name`, `owner`, `enabled`, `category`, `date_text`, `background_image`, `site_url`) ";
+        $query .= "VALUES ('".clean($name)."', '".intval($owner)."', '".intval($enabled)."' , '".intval($category)."', '".clean($date_text)."', '".clean($background_image)."', '".clean($site_url)."'); ";
 
         $db->setQuery($query);
         $db->query();
@@ -209,7 +205,7 @@ class BannerAdminDatabase
     {
         $db =& JFactory::getDBO();
 
-        $query = "SELECT lunch_text, altlunch_text ";
+        $query = "SELECT main_text, sub_text ";
         $query .= "FROM `#__eventlist_banner_values` ";
         $query .= "WHERE (banner_id='".intval($bannerID)."') ";
         $query .= "AND (enabled = '1') ";
@@ -224,8 +220,8 @@ class BannerAdminDatabase
     {
         $db =& JFactory::getDBO();
 
-        //$query = "SELECT `id`, `banner_date`, DAYOFMONTH(banner_date) as day_of_month, WEEK(banner_date, 3) as week_number, `lunch_text`, `altlunch_text` "; //GET_FORMAT(banner_date,'ISO') AS date_text, 
-        $query = "SELECT `id`, `banner_date`, DAYOFMONTH(banner_date) as day_of_month, `lunch_text`, `altlunch_text` "; //GET_FORMAT(banner_date,'ISO') AS date_text, 
+        //$query = "SELECT `id`, `banner_date`, DAYOFMONTH(banner_date) as day_of_month, WEEK(banner_date, 3) as week_number, `main_text`, `sub_text` "; //GET_FORMAT(banner_date,'ISO') AS date_text, 
+        $query = "SELECT `id`, `banner_date`, DAYOFMONTH(banner_date) as day_of_month, `main_text`, `sub_text` "; //GET_FORMAT(banner_date,'ISO') AS date_text, 
         $query .= "FROM `#__eventlist_banner_values` ";
         $query .= "WHERE (banner_id='".intval($bannerID)."') ";
         $query .= "AND (enabled = '1') ";
@@ -243,7 +239,7 @@ class BannerAdminDatabase
     {
         $db =& JFactory::getDBO();
 
-        $query = "SELECT `id`, `banner_date`, DAYOFMONTH(banner_date) as day_of_month, WEEK(banner_date, 3) as week_number, `lunch_text`, `altlunch_text` "; //GET_FORMAT(banner_date,'ISO') AS date_text, 
+        $query = "SELECT `id`, `banner_date`, DAYOFMONTH(banner_date) as day_of_month, WEEK(banner_date, 3) as week_number, `main_text`, `sub_text` "; //GET_FORMAT(banner_date,'ISO') AS date_text, 
         $query .= "FROM `#__eventlist_banner_values` ";
         $query .= "WHERE (banner_id='".intval($bannerID)."') ";
         $query .= "AND (enabled = '1') ";
@@ -297,13 +293,13 @@ class BannerAdminDatabase
     }
     
     
-    private static function addBannerText($banner_id, $banner_date, $lunch_text, $altlunch_text)
+    private static function addBannerText($banner_id, $banner_date, $main_text, $sub_text)
     {
         $db =& JFactory::getDBO();
 
         $query = "INSERT INTO `#__eventlist_banner_values` ";
-        $query .= "(`banner_id`, `banner_date`, `lunch_text`, `altlunch_text`) ";
-        $query .= "VALUES ('".intval($banner_id)."', '".clean($banner_date)."', '".clean($lunch_text)."', '".clean($altlunch_text)."'); ";
+        $query .= "(`banner_id`, `banner_date`, `main_text`, `sub_text`) ";
+        $query .= "VALUES ('".intval($banner_id)."', '".clean($banner_date)."', '".clean($main_text)."', '".clean($sub_text)."'); ";
 
         $db->setQuery($query);
         $db->query();
@@ -315,7 +311,7 @@ class BannerAdminDatabase
     {
     	$db =& JFactory::getDBO();
 
-        $query = "SELECT `lunch_text`, `altlunch_text` ";
+        $query = "SELECT `main_text`, `sub_text` ";
         $query .= "FROM `#__eventlist_banner_values` ";
         $query .= "WHERE (id='".intval($id)."') ";
         $query .= "AND (banner_date = '".clean($banner_date)."') ";
@@ -327,12 +323,12 @@ class BannerAdminDatabase
     
     //NOTE: 'id' is NOT the same as 'banner_id'
     //The extra "banner_id" parameter is there for added security
-    public static function setBannerTextByID($id, $banner_id, $lunch_text, $altlunch_text)
+    public static function setBannerTextByID($id, $banner_id, $main_text, $sub_text)
     {
         $db =& JFactory::getDBO();
 
         $query = "UPDATE `#__eventlist_banner_values` ";
-        $query .= "SET `lunch_text` = '".clean($lunch_text)."', `altlunch_text` = '".clean($altlunch_text)."' ";
+        $query .= "SET `main_text` = '".clean($main_text)."', `sub_text` = '".clean($sub_text)."' ";
         $query .= "WHERE (id='".intval($id)."') ";
         $query .= "AND (banner_id='".intval($banner_id)."') ";
         $query .= "LIMIT 1; ";

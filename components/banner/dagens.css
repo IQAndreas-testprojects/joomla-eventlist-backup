@@ -11,12 +11,20 @@ img.dagens {
 				max-height:155px;
 				float:left;
 }
-.dagens h1 {
+h1.dagens  {
 				font:14px arial,helvetica,sans-serif;
 				color: #000000;
 				font-weight:normal;
+				text-transform:none;
+				padding-bottom:15px;
 }
-.dagens h2 {
+h2.dagens  {
+				font: 12px arial,helvetica,sans-serif;
+				color: #000000;
+				font-weight:normal;
+				text-transform:none;
+}
+h6.dagens  {
 				font: 12px arial,helvetica,sans-serif;
 				color: #000000;
 				font-weight:normal;
@@ -73,4 +81,10 @@ textarea.alt_lunch {
 				font: 12px arial,helvetica,sans-serif;
 				color: #000000;
 				font-weight:normal;
+}
+tr.odd {
+				background: #e0e0e0;
+}
+.old {
+				color: #999999;
 }

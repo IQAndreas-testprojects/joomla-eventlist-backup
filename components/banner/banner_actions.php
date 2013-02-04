@@ -90,7 +90,8 @@ class BannerActions
     				BannerActions::$editTextID = $textID;
     				
     				//Set the text of the date - for visible purposes only
-					JRequest::setVar('date_text', strftime(DATEFORMAT_TIME_TEXT, $phpDate));
+		    		$date_text = $banner->date_text . " " . strftime($banner->date_format, $phpDate);
+		    		JRequest::setVar('date_text', $date_text);
     		
 					return EDIT_BANNER;
                 }                
@@ -157,10 +158,13 @@ class BannerActions
     	JRequest::setVar('background_image', $banner->background_image);
     	JRequest::setVar('price_text', $banner->price_text);    	    	
     	JRequest::setVar('time_text', $banner->time_text);
+    	
+    	JRequest::setVar('date_text', $banner->date_text);    	    	
+    	JRequest::setVar('date_format', $banner->date_format);
 
     	//Instead of retrieving a date, display the default text
-    	JRequest::setVar('lunch_text', SAMPLE_LUNCH_TEXT);
-    	JRequest::setVar('altlunch_text', SAMPLE_ALTLUNCH_TEXT);
+    	JRequest::setVar('main_text', SAMPLE_MAIN_TEXT);
+    	JRequest::setVar('sub_text', SAMPLE_SUB_TEXT);
     	
     	return EDIT_BANNER_SETTINGS;
     }
@@ -187,12 +191,13 @@ class BannerActions
     		
     		//This one is okay to pass via JRequest, and saves calculating time
     		//JRequest::setVar('mysqlDate', $mysqlDate);
-    		JRequest::setVar('lunch_text', $text->lunch_text);
-    		JRequest::setVar('altlunch_text', $text->altlunch_text);
+    		JRequest::setVar('main_text', $text->main_text);
+    		JRequest::setVar('sub_text', $text->sub_text);
     		JRequest::setVar('text_id', $textID); //Yes, duplicate, but this is okay
     		
     		//Used for the preview
-    		JRequest::setVar('date_text', strftime(DATEFORMAT_TIME_TEXT, $phpDate));
+    		$date_text = $banner->date_text . " " . strftime($banner->date_format, $phpDate);
+    		JRequest::setVar('date_text', $date_text);
     		
     		//Setting the "editTextID" property will automatically make the extra form appear
     		return EDIT_BANNER;
@@ -238,6 +243,7 @@ class BannerActions
     	BannerDatabase::editBannerSettings($banner->id,
     		 JRequest::getString('site_url'),
     		 JRequest::getString('background_image'),
+    		 JRequest::getString('date_text'),
     		 JRequest::getString('price_text'),
     		 JRequest::getString('time_text'));
     		 
@@ -257,10 +263,12 @@ class BannerActions
     	
     	//The database will automatically clean the strings.
     	
-    	BannerDatabase::setBannerTextByID(JRequest::getInt('text_id'), $banner->id, JRequest::getString('lunch_text'), JRequest::getString('altlunch_text'));
+    	BannerDatabase::setBannerTextByID(JRequest::getInt('text_id'), $banner->id, JRequest::getString('main_text'), JRequest::getString('sub_text'));
+    	
+    	$date_text = $banner->date_text . " " . strftime($banner->date_format, mktime(0, 0, 0, JRequest::getInt('m'), JRequest::getInt('d'), JRequest::getInt('y')));
     	
     	//Now make the preview thingy look nice
-		JRequest::setVar('date_text', strftime(DATEFORMAT_TIME_TEXT, mktime(0, 0, 0, JRequest::getInt('m'), JRequest::getInt('d'), JRequest::getInt('y'))));
+		JRequest::setVar('date_text', $date_text);
     	
    		return EDIT_BANNER;
     }
@@ -337,21 +345,27 @@ class BannerActions
     	
     	//The number of days in the specified month
    		$numDays = date("t", mktime(0,0,0, $month, 1, $year));
-    	$lunchTextArray = array();
-    	$altlunchTextArray = array();
+    	$mainTextArray = array();
+    	$subTextArray = array();
     	
     	for ($i = 1; $i <= $numDays; $i++)
     	{
     		//Fill the array with blank values
-    		$lunchTextArray[$i] = NO_LUNCH_TEXT;
-    		$altlunchTextArray[$i] = NO_ALTLUNCH_TEXT;
+    		$mainTextArray[$i] = NO_MAIN_TEXT;
+    		$subTextArray[$i] = NO_SUB_TEXT;
     	}
     	
-    	//Prepopulate the day array
-    	foreach($databaseTextArray as $bannerText)
+    	
+    	//Only loop through if the query actually returned data
+    	//This prevents error messages
+    	if ($databaseTextArray)
     	{
-    		$lunchTextArray[$bannerText->day_of_month] = $bannerText->lunch_text;
-    		$altlunchTextArray[$bannerText->day_of_month] = $bannerText->altlunch_text;
+    		//Prepopulate the day array
+    		foreach($databaseTextArray as $bannerText)
+    		{
+    			$mainTextArray[$bannerText->day_of_month] = $bannerText->main_text;
+    			$subTextArray[$bannerText->day_of_month] = $bannerText->sub_text;
+    		}
     	}
     	
     	echo '<br />';
@@ -365,12 +379,23 @@ class BannerActions
     		
     		echo '<tr class="'.$class.'">';
     		
+    		//Only allowed to edit banners which days have not passed yet!
     		if ($editable)
-    			{ echo '<td valign="top"><a href="'.$baseURL."&d=".$i.'"><img src="'.EDIT_IMAGE.'" /></a></td>'; }
-            
+    		{ 
+    			if ($dullOldText && ($i < $currentDay))
+    			{
+    				//Old date - not editable
+    				echo '<td valign="top"></td>';
+    			}
+    			else
+    			{ 
+    				echo '<td valign="top"><a href="'.$baseURL."&d=".$i.'"><img src="'.EDIT_IMAGE.'" /></a></td>'; 
+    			}
+    		}
+    		
     		echo '<td valign="top">'.$i.".".'</td>';	
-    		echo '<td valign="top">'.Banner::makeHTML($lunchTextArray[$i]).'</td>';
-    		echo '<td valign="top">'.Banner::makeHTML($altlunchTextArray[$i]).'</td>';
+    		echo '<td valign="top">'.Banner::makeHTML($mainTextArray[$i]).'</td>';
+    		echo '<td valign="top">'.Banner::makeHTML($subTextArray[$i]).'</td>';
     		
     		echo '</tr>';
     		

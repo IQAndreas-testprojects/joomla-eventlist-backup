@@ -10,9 +10,9 @@ $bannerEditURL = "index.php?option=com_eventlist&task=edit_banner&id=".$banner_i
 $phpDate = mktime(0, 0, 0, JRequest::getInt('m'), JRequest::getInt('d'), JRequest::getInt('y'));
 
 //"import" setting from JRequest values
-$text_id 		= JRequest::getInt('text_id');
-$lunch_text		= JRequest::getString('lunch_text', "");
-$altlunch_text	= JRequest::getString('altlunch_text', "");
+$text_id 	= JRequest::getInt('text_id');
+$main_text	= JRequest::getString('main_text', "");
+$sub_text	= JRequest::getString('sub_text', "");
 
 ?>
 
@@ -22,12 +22,12 @@ $altlunch_text	= JRequest::getString('altlunch_text', "");
 <form action="<?php echo $bannerEditURL; ?>" method="post">
 
 	<span class="fel">
-		<?php echo BannerActions::getErrors('lunch_text'); ?>
-		<?php echo BannerActions::getErrors('altlunch_text'); ?>
+		<?php echo BannerActions::getErrors('main_text'); ?>
+		<?php echo BannerActions::getErrors('sub_text'); ?>
 	</span>
 	<br />
-	<?php echo LABEL_LUNCH_TEXT; ?><br /><textarea name="lunch_text" cols="66" rows="3" wrap="soft" maxlength="255"><?php echo htmlspecialchars($lunch_text); ?></textarea><br/>
-	<?php echo LABEL_ALTLUNCH_TEXT; ?><br /><textarea name="altlunch_text" COLS=66 ROWS=3 wrap="soft" maxlength="1000"><?php echo htmlspecialchars($altlunch_text); ?></textarea>
+	<?php echo LABEL_LUNCH_TEXT; ?><br /><textarea name="main_text" cols="66" rows="3" wrap="soft" maxlength="255"><?php echo htmlspecialchars($main_text); ?></textarea><br/>
+	<?php echo LABEL_ALTLUNCH_TEXT; ?><br /><textarea name="sub_text" COLS=66 ROWS=3 wrap="soft" maxlength="1000"><?php echo htmlspecialchars($sub_text); ?></textarea>
 	
 	<input type="hidden" name="text_id" value="<?php echo $text_id; ?>" />
     <input type="hidden" name="id" value="<?php echo $banner_id; ?>" />
@@ -37,6 +37,7 @@ $altlunch_text	= JRequest::getString('altlunch_text', "");
 	<input type="hidden" name="m" value="<?php echo JRequest::getInt('m'); ?>" />
 	<input type="hidden" name="y" value="<?php echo JRequest::getInt('y'); ?>" />
     
+    <br/>
     <input type="submit" name="save" value="<?php echo SAVE_BANNER_TEXT; ?>" />
     <input type="submit" name="preview" value="<?php echo PREVIEW_BANNER_TEXT; ?>" />
 </form>

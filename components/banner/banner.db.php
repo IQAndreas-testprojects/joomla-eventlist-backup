@@ -17,7 +17,7 @@ class BannerDatabase
     {
         $db =& JFactory::getDBO();
 
-        $query = "SELECT `id`, `name`, `owner`, `enabled`, `category`, `background_image`, `site_url`, `price_text`, `time_text` ";
+        $query = "SELECT `id`, `name`, `owner`, `enabled`, `category`, `background_image`, `site_url`, `date_text`, `date_format`, `price_text`, `time_text` ";
         $query .= "FROM `#__eventlist_banners`; ";
         
         $db->setQuery($query);
@@ -28,7 +28,7 @@ class BannerDatabase
     {
         $db =& JFactory::getDBO();
 
-        $query = "SELECT `id`, `name`, `owner`, `category`, `background_image`, `site_url`, `price_text`, `time_text` ";
+        $query = "SELECT `id`, `name`, `owner`, `category`, `background_image`, `site_url`, `date_text`, `date_format`, `price_text`, `time_text` ";
         $query .= "FROM `#__eventlist_banners` ";
         $query .= "WHERE (category='".intval($categoryID)."'); ";
         
@@ -41,7 +41,7 @@ class BannerDatabase
     {
         $db =& JFactory::getDBO();
 
-        $query = "SELECT * ";//`id`, `name`, `owner`, `enabled`, `category`, `background_image`, `site_url`, `price_text`, `time_text` ";
+        $query = "SELECT * ";//`id`, `name`, `owner`, `enabled`, `category`, `background_image`, `site_url`, `date_text`, `date_format`, `price_text`, `time_text` ";
         $query .= "FROM `#__eventlist_banners` ";
         $query .= "WHERE (`enabled`='1'); ";
         
@@ -54,7 +54,7 @@ class BannerDatabase
     {
         $db =& JFactory::getDBO();
 
-        $query = "SELECT `id`, `name`, `owner`, `category`, `background_image`, `site_url`, `price_text`, `time_text` ";
+        $query = "SELECT `id`, `name`, `owner`, `category`, `background_image`, `site_url`, `date_text`, `date_format`, `price_text`, `time_text` ";
         $query .= "FROM `#__eventlist_banners` ";
         $query .= "WHERE (category='".intval($categoryID)."') ";
         $query .= "AND (enabled='1'); ";
@@ -68,7 +68,7 @@ class BannerDatabase
     {
         $db =& JFactory::getDBO();
 
-        $query = "SELECT `id`, `name`, `owner`, `enabled`, `category`, `background_image`, `site_url`, `price_text`, `time_text` ";
+        $query = "SELECT `id`, `name`, `owner`, `enabled`, `category`, `background_image`, `site_url`, `date_text`, `date_format`, `price_text`, `time_text` ";
         $query .= "FROM `#__eventlist_banners` ";
         $query .= "WHERE (id='".intval($bannerID)."') ";
         $query .= "LIMIT 1; ";
@@ -107,12 +107,12 @@ class BannerDatabase
     
     //This only edits a small set of settings which are allowed to be set by
     //the banner owners
-    public static function editBannerSettings($bannerID, $site_url, $background_image, $price_text, $time_text)
+    public static function editBannerSettings($bannerID, $site_url, $background_image, $date_text, $price_text, $time_text)
     {
         $db =& JFactory::getDBO();
 
         $query = "UPDATE `#__eventlist_banners` ";
-        $query .= "SET `site_url` = '".clean($site_url)."', `background_image` = '".clean($background_image)."', `price_text` = '".clean($price_text)."', `time_text` = '".clean($time_text)."' ";
+        $query .= "SET `site_url` = '".clean($site_url)."', `background_image` = '".clean($background_image)."', `date_text` = '".clean($date_text)."', `price_text` = '".clean($price_text)."', `time_text` = '".clean($time_text)."' ";
         $query .= "WHERE (id='".intval($bannerID)."') ";
         $query .= "LIMIT 1; ";
 
@@ -152,7 +152,7 @@ class BannerDatabase
     {
         $db =& JFactory::getDBO();
 
-        $query = "SELECT lunch_text, altlunch_text ";
+        $query = "SELECT main_text, sub_text ";
         $query .= "FROM `#__eventlist_banner_values` ";
         $query .= "WHERE (banner_id='".intval($bannerID)."') ";
         $query .= "AND (enabled = '1') ";
@@ -167,8 +167,8 @@ class BannerDatabase
     {
         $db =& JFactory::getDBO();
 
-        //$query = "SELECT `id`, `banner_date`, DAYOFMONTH(banner_date) as day_of_month, WEEK(banner_date, 3) as week_number, `lunch_text`, `altlunch_text` "; //GET_FORMAT(banner_date,'ISO') AS date_text, 
-        $query = "SELECT `id`, `banner_date`, DAYOFMONTH(banner_date) as day_of_month, `lunch_text`, `altlunch_text` "; //GET_FORMAT(banner_date,'ISO') AS date_text, 
+        //$query = "SELECT `id`, `banner_date`, DAYOFMONTH(banner_date) as day_of_month, WEEK(banner_date, 3) as week_number, `main_text`, `sub_text` "; //GET_FORMAT(banner_date,'ISO') AS date_text, 
+        $query = "SELECT `id`, `banner_date`, DAYOFMONTH(banner_date) as day_of_month, `main_text`, `sub_text` "; //GET_FORMAT(banner_date,'ISO') AS date_text, 
         $query .= "FROM `#__eventlist_banner_values` ";
         $query .= "WHERE (banner_id='".intval($bannerID)."') ";
         $query .= "AND (enabled = '1') ";
@@ -186,7 +186,7 @@ class BannerDatabase
     {
         $db =& JFactory::getDBO();
 
-        $query = "SELECT `id`, `banner_date`, DAYOFMONTH(banner_date) as day_of_month, WEEK(banner_date, 3) as week_number, `lunch_text`, `altlunch_text` "; //GET_FORMAT(banner_date,'ISO') AS date_text, 
+        $query = "SELECT `id`, `banner_date`, DAYOFMONTH(banner_date) as day_of_month, WEEK(banner_date, 3) as week_number, `main_text`, `sub_text` "; //GET_FORMAT(banner_date,'ISO') AS date_text, 
         $query .= "FROM `#__eventlist_banner_values` ";
         $query .= "WHERE (banner_id='".intval($bannerID)."') ";
         $query .= "AND (enabled = '1') ";
@@ -240,13 +240,13 @@ class BannerDatabase
     }
     
     
-    private static function addBannerText($banner_id, $banner_date, $lunch_text, $altlunch_text)
+    private static function addBannerText($banner_id, $banner_date, $main_text, $sub_text)
     {
         $db =& JFactory::getDBO();
 
         $query = "INSERT INTO `#__eventlist_banner_values` ";
-        $query .= "(`banner_id`, `banner_date`, `lunch_text`, `altlunch_text`) ";
-        $query .= "VALUES ('".intval($banner_id)."', '".clean($banner_date)."', '".clean($lunch_text)."', '".clean($altlunch_text)."'); ";
+        $query .= "(`banner_id`, `banner_date`, `main_text`, `sub_text`) ";
+        $query .= "VALUES ('".intval($banner_id)."', '".clean($banner_date)."', '".clean($main_text)."', '".clean($sub_text)."'); ";
 
         $db->setQuery($query);
         $db->query();
@@ -258,7 +258,7 @@ class BannerDatabase
     {
     	$db =& JFactory::getDBO();
 
-        $query = "SELECT `lunch_text`, `altlunch_text` ";
+        $query = "SELECT `main_text`, `sub_text` ";
         $query .= "FROM `#__eventlist_banner_values` ";
         $query .= "WHERE (id='".intval($id)."') ";
         $query .= "AND (banner_date = '".clean($banner_date)."') ";
@@ -270,12 +270,12 @@ class BannerDatabase
     
     //NOTE: 'id' is NOT the same as 'banner_id'
     //The extra "banner_id" parameter is there for added security
-    public static function setBannerTextByID($id, $banner_id, $lunch_text, $altlunch_text)
+    public static function setBannerTextByID($id, $banner_id, $main_text, $sub_text)
     {
         $db =& JFactory::getDBO();
 
         $query = "UPDATE `#__eventlist_banner_values` ";
-        $query .= "SET `lunch_text` = '".clean($lunch_text)."', `altlunch_text` = '".clean($altlunch_text)."' ";
+        $query .= "SET `main_text` = '".clean($main_text)."', `sub_text` = '".clean($sub_text)."' ";
         $query .= "WHERE (id='".intval($id)."') ";
         $query .= "AND (banner_id='".intval($banner_id)."') ";
         $query .= "LIMIT 1; ";

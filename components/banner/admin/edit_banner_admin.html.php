@@ -46,6 +46,7 @@ $banner_category = JRequest::getInt('banner_category');
 
 </form>
 
+<br/><br/>VARNING! Annonsen raderas permanent!
 <form action="<?php echo $returnURL; ?>" method="post">
 <?php 
 		if (JRequest::getCmd('edit'))

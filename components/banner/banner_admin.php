@@ -197,11 +197,19 @@ class BannerAdmin
 		}
 		//else continue
 
+		//Set the default header text (aka date text)
+		$date_text = JRequest::getString('banner_name');
+		
+		if (JRequest::getInt('banner_category') == CAT_LUNCHGUIDEN)
+			{ $date_text = LUNCH_DEFAULT_HEADER_TEXT; }
+			
+		
 		//The database will automatically clean the strings. phew...
 		BannerAdminDatabase::addBanner(
 				JRequest::getString('banner_name'),
 				JRequest::getInt('banner_owner'),
-				JRequest::getInt('banner_category'));
+				JRequest::getInt('banner_category'),
+				$date_text);
 		
 		return LIST_BANNERS;
 	}
@@ -269,11 +277,6 @@ class BannerAdmin
 	{
 		
 		$bannersArray = BannerAdminDatabase::getBanners();
-		
-		{
-			$lunchTextArray[$bannerText->day_of_month] = $bannerText->lunch_text;
-			$altlunchTextArray[$bannerText->day_of_month] = $bannerText->altlunch_text;
-		}
 		
 		$i = 0;
 		echo '<table>';
