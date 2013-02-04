@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.1 $Id: view.html.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.1 $Id: view.html.php 1001 2009-04-14 15:07:36Z julienv $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -41,7 +41,7 @@ class EventListViewDetails extends JView
 	function display($tpl = null)
 	{
 		global $mainframe;
-
+		
 		$document 	= & JFactory::getDocument();
 		$user		= & JFactory::getUser();
 		$dispatcher = & JDispatcher::getInstance();
@@ -208,6 +208,10 @@ class EventListViewDetails extends JView
         if ($row->country) {
         	$row->countryimg = ELOutput::getFlag( $row->country );
         }
+        
+    // load dispatcher for plugins    
+    JPluginHelper::importPlugin( 'eventlist' );
+    $dispatcher =& JDispatcher::getInstance();  
 
 		//assign vars to jview
 		$this->assignRef('row', 					$row);
@@ -216,11 +220,12 @@ class EventListViewDetails extends JView
 		$this->assignRef('allowedtoeditvenue' , 	$allowedtoeditvenue);
 		$this->assignRef('dimage' , 				$dimage);
 		$this->assignRef('limage' , 				$limage);
-		$this->assignRef('print_link' , 			$print_link);
-		$this->assignRef('registers' , 				$registers);
-		$this->assignRef('formhandler',				$formhandler);
-		$this->assignRef('elsettings' , 			$elsettings);
+		$this->assignRef('print_link' , 		$print_link);
+		$this->assignRef('registers' , 			$registers);
+		$this->assignRef('formhandler',			$formhandler);
+		$this->assignRef('elsettings' , 		$elsettings);
 		$this->assignRef('item' , 					$item);
+    $this->assignRef('dispatcher' ,     $dispatcher);
 
 		parent::display($tpl);
 	}

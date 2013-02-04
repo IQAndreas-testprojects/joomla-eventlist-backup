@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: view.html.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: view.html.php 1021 2009-04-27 08:56:08Z julienv $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -112,7 +112,7 @@ class EventListViewVenueevents extends JView
 		
 		//set Page title
 		$mainframe->setPageTitle( $pagetitle );
-   		$mainframe->addMetaTag( 'title' , $pagetitle );
+   	$mainframe->addMetaTag( 'title' , $pagetitle );
 		$document->setMetadata('keywords', $venue->meta_keywords );
 		$document->setDescription( strip_tags($venue->meta_description) );
 
@@ -127,6 +127,9 @@ class EventListViewVenueevents extends JView
 		//Check if the user has access to the form
 		$maintainer = ELUser::ismaintainer();
 		$genaccess 	= ELUser::validate_user( $elsettings->evdelrec, $elsettings->delivereventsyes );
+		
+		// Edit venue rights
+    $allowedtoeditvenue = ELUser::editaccess($elsettings->venueowner, $venue->created_by, $elsettings->venueeditrec, $elsettings->venueedit);
 
 		if ($maintainer || $genaccess ) $dellink = 1;
 
@@ -143,21 +146,21 @@ class EventListViewVenueevents extends JView
 		}
 
 		//build the url
-        if(!empty($venue->url) && strtolower(substr($venue->url, 0, 7)) != "http://") {
-        	$venue->url = 'http://'.$venue->url;
-        }
+		if(!empty($venue->url) && strtolower(substr($venue->url, 0, 7)) != "http://") {
+			$venue->url = 'http://'.$venue->url;
+		}
 
-        //prepare the url for output
-        if (strlen(htmlspecialchars($venue->url, ENT_QUOTES)) > 35) {
+		//prepare the url for output
+		if (strlen(htmlspecialchars($venue->url, ENT_QUOTES)) > 35) {
 			$venue->urlclean = substr( htmlspecialchars($venue->url, ENT_QUOTES), 0 , 35).'...';
 		} else {
 			$venue->urlclean = htmlspecialchars($venue->url, ENT_QUOTES);
 		}
 
-        //create flag
-        if ($venue->country) {
-        	$venue->countryimg = ELOutput::getFlag( $venue->country );
-        }
+		//create flag
+		if ($venue->country) {
+			$venue->countryimg = ELOutput::getFlag( $venue->country );
+		}
 
 		// Create the pagination object
 		jimport('joomla.html.pagination');
@@ -181,6 +184,7 @@ class EventListViewVenueevents extends JView
 		$this->assignRef('item' , 					$item);
 		$this->assignRef('pagetitle' , 				$pagetitle);
 		$this->assignRef('task' , 					$task);
+    $this->assignRef('allowedtoeditvenue', $allowedtoeditvenue);
 
 		parent::display($tpl);
 	}
@@ -216,7 +220,7 @@ class EventListViewVenueevents extends JView
 		$filter_order		= JRequest::getCmd('filter_order', 'a.dates');
 		$filter_order_Dir	= JRequest::getWord('filter_order_Dir', 'ASC');
 
-		$filter				= JRequest::getString('filter');
+		$filter				= $this->escape(JRequest::getString('filter'));
 		$filter_type		= JRequest::getString('filter_type');
 
 		if ($elsettings->showcat) {

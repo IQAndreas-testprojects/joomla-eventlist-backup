@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: editevent.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: editevent.php 1091 2009-07-22 18:19:02Z schlu $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -138,29 +138,51 @@ class EventListModelEditevent extends JModel
 				JError::raiseError( 403, JText::_( 'NO ACCESS' ) );
 
 			}
+			
+			//sticky forms
+			$session = &JFactory::getSession();
+			if ($session->has('eventform', 'com_eventlist')) {
+				
+				$eventform 		= $session->get('eventform', 0, 'com_eventlist');
+				$this->_event 	= & JTable::getInstance('eventlist_events', '');
+								
+				if (!$this->_event->bind($eventform)) {
+					JError::raiseError( 500, $this->_db->stderr() );
+					return false;
+				}
+				
+				$query = 'SELECT venue'
+					. ' FROM #__eventlist_venues'
+					. ' WHERE id = '.(int)$eventform['locid']
+					;
+				$this->_db->setQuery($query);
+				$this->_event->venue = $this->_db->loadResult();
+								
+			} else {
 
-			//prepare output
-			$this->_event->id				= 0;
-			$this->_event->locid			= '';
-			$this->_event->catsid			= 0;
-			$this->_event->dates			= '';
-			$this->_event->enddates			= null;
-			$this->_event->title			= '';
-			$this->_event->times			= null;
-			$this->_event->endtimes			= null;
-			$this->_event->created			= null;
-			$this->_event->author_ip		= null;
-			$this->_event->created_by		= null;
-			$this->_event->datdescription	= '';
-			$this->_event->registra			= 0;
-			$this->_event->unregistra		= 0;
-			$this->_event->recurrence_number	= 0;
-			$this->_event->recurrence_type		= 0;
-			$this->_event->recurrence_counter	= '0000-00-00';
-			$this->_event->sendername		= '';
-			$this->_event->sendermail		= '';
-			$this->_event->datimage			= '';
-			$this->_event->venue			= JText::_('SELECTVENUE');
+				//prepare output
+				$this->_event->id				= 0;
+				$this->_event->locid			= '';
+				$this->_event->catsid			= 0;
+				$this->_event->dates			= '';
+				$this->_event->enddates			= null;
+				$this->_event->title			= '';
+				$this->_event->times			= null;
+				$this->_event->endtimes			= null;
+				$this->_event->created			= null;
+				$this->_event->author_ip		= null;
+				$this->_event->created_by		= null;
+				$this->_event->datdescription	= '';
+				$this->_event->registra			= 0;
+				$this->_event->unregistra		= 0;
+				$this->_event->recurrence_number	= 0;
+				$this->_event->recurrence_type		= 0;
+				$this->_event->recurrence_counter	= '0000-00-00';
+				$this->_event->sendername		= '';
+				$this->_event->sendermail		= '';
+				$this->_event->datimage			= '';
+				$this->_event->venue			= JText::_('SELECTVENUE');
+			}
 
 		}
 
@@ -455,11 +477,11 @@ class EventListModelEditevent extends JModel
 		$data['datdescription'] = JRequest::getVar( 'datdescription', '', 'post','string', JREQUEST_ALLOWRAW );
 
 		//include the metatags
-		$data['meta_description'] = addslashes(htmlspecialchars(trim($elsettings->meta_description)));
+		//$data['meta_description'] = addslashes(htmlspecialchars(trim($elsettings->meta_description)));
 		if (strlen($data['meta_description']) > 255) {
 			$data['meta_description'] = substr($data['meta_description'],0,254);
 		}
-		$data['meta_keywords'] = addslashes(htmlspecialchars(trim($elsettings->meta_keywords)));
+		//$data['meta_keywords'] = addslashes(htmlspecialchars(trim($elsettings->meta_keywords)));
 		if (strlen($data['meta_keywords']) > 200) {
 			$data['meta_keywords'] = substr($data['meta_keywords'],0,199);
 		}
@@ -648,10 +670,13 @@ class EventListModelEditevent extends JModel
 		$this->_db->setQuery('SELECT * FROM #__eventlist_venues WHERE id = '.(int)$row->locid);
 		$rowloc = $this->_db->loadObject();
 
+		// manage mailing
 		jimport('joomla.utilities.mail');
-
-		$link 	= JURI::base().JRoute::_('index.php?view=details&id='.$row->id, false);
-
+    // link for event
+		$link 	= JRoute::_(JURI::base().'index.php?view=details&id='.$row->id, false);
+    // strip description from tags / scripts, etc...
+		$text_description = JFilterOutput::cleanText($row->datdescription);
+		
 		//create the mail for the site owner
 		if (($elsettings->mailinform == 1) || ($elsettings->mailinform == 3)) {
 
@@ -663,13 +688,13 @@ class EventListModelEditevent extends JModel
 
 				$modified_ip 	= getenv('REMOTE_ADDR');
 				$edited 		= JHTML::Date( $row->modified, JText::_( 'DATE_FORMAT_LC2' ) );
-				$mailbody 		= JText::sprintf('MAIL EDIT EVENT', $user->name, $user->username, $user->email, $modified_ip, $edited, $row->title, $row->dates, $row->times, $rowloc->venue, $rowloc->city, $row->datdescription, $state);
+				$mailbody 		= JText::sprintf('MAIL EDIT EVENT', $user->name, $user->username, $user->email, $modified_ip, $edited, $row->title, $row->dates, $row->times, $rowloc->venue, $rowloc->city, $text_description, $state);
 				$mail->setSubject( $SiteName.JText::_( 'EDIT EVENT MAIL' ) );
 
 			} else {
 
 				$created 	= JHTML::Date( $row->created, JText::_( 'DATE_FORMAT_LC2' ) );
-				$mailbody 	= JText::sprintf('MAIL NEW EVENT', $user->name, $user->username, $user->email, $row->author_ip, $created, $row->title, $row->dates, $row->times, $rowloc->venue, $rowloc->city, $row->datdescription, $state);
+				$mailbody 	= JText::sprintf('MAIL NEW EVENT', $user->name, $user->username, $user->email, $row->author_ip, $created, $row->title, $row->dates, $row->times, $rowloc->venue, $rowloc->city, $text_description, $state);
 				$mail->setSubject( $SiteName.JText::_( 'NEW EVENT MAIL' ) );
 
 			}
@@ -694,13 +719,13 @@ class EventListModelEditevent extends JModel
 			if ($edited) {
 
 				$edited 		= JHTML::Date( $row->modified, JText::_( 'DATE_FORMAT_LC2' ) );
-				$mailbody 		= JText::sprintf('USER MAIL EDIT EVENT', $user->name, $user->username, $edited, $row->title, $row->dates, $row->times, $rowloc->venue, $rowloc->city, $row->datdescription, $state);
+				$mailbody 		= JText::sprintf('USER MAIL EDIT EVENT', $user->name, $user->username, $edited, $row->title, $row->dates, $row->times, $rowloc->venue, $rowloc->city, $text_description, $state);
 				$usermail->setSubject( $SiteName.JText::_( 'EDIT USER EVENT MAIL' ) );
 
 			} else {
 
 				$created 	= JHTML::Date( $row->created, JText::_( 'DATE_FORMAT_LC2' ) );
-				$mailbody 	= JText::sprintf('USER MAIL NEW EVENT', $user->name, $user->username, $created, $row->title, $row->dates, $row->times, $rowloc->venue, $rowloc->city, $row->datdescription, $state);
+				$mailbody 	= JText::sprintf('USER MAIL NEW EVENT', $user->name, $user->username, $created, $row->title, $row->dates, $row->times, $rowloc->venue, $rowloc->city, $text_description, $state);
 				$usermail->setSubject( $SiteName.JText::_( 'NEW USER EVENT MAIL' ) );
 
 			}

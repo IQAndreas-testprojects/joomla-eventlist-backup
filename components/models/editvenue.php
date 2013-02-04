@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: editvenue.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: editvenue.php 1095 2009-07-23 17:52:50Z schlu $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -110,28 +110,40 @@ class EventListModelEditvenue extends JModel
 			$delloclink = ELUser::validate_user( $elsettings->locdelrec, $elsettings->deliverlocsyes );
 
 			if ($delloclink == 0) {
-
 				JError::raiseError( 403, JText::_( 'NO ACCESS' ) );
-
 			}
+			
+			//sticky forms
+			$session = &JFactory::getSession();
+			if ($session->has('venueform', 'com_eventlist')) {
+				
+				$venueform 		= $session->get('venueform', 0, 'com_eventlist');
+				$this->_venue 	= & JTable::getInstance('eventlist_venues', '');
+								
+				if (!$this->_venue->bind($venueform)) {
+					JError::raiseError( 500, $this->_db->stderr() );
+					return false;
+				}
+			} else {
 
-			//prepare output
-			$this->_venue->id				= '';
-			$this->_venue->venue			= '';
-			$this->_venue->url				= '';
-			$this->_venue->street			= '';
-			$this->_venue->plz				= '';
-			$this->_venue->locdescription	= '';
-			$this->_venue->city				= '';
-			$this->_venue->state			= '';
-			$this->_venue->country			= '';
-			$this->_venue->map				= $elsettings->showmapserv ? 1 : 0;
-			$this->_venue->created			= '';
-			$this->_venue->created_by		= '';
-			$this->_venue->author_ip		= '';
-			$this->_venue->locimage			= '';
-			$this->_venue->meta_keywords	= '';
-			$this->_venue->meta_description	= '';
+				//prepare output
+				$this->_venue->id				= '';
+				$this->_venue->venue			= '';
+				$this->_venue->url				= '';
+				$this->_venue->street			= '';
+				$this->_venue->plz				= '';
+				$this->_venue->locdescription	= '';
+				$this->_venue->city				= '';
+				$this->_venue->state			= '';
+				$this->_venue->country			= '';
+				$this->_venue->map				= $elsettings->showmapserv ? 1 : 0;
+				$this->_venue->created			= '';
+				$this->_venue->created_by		= '';
+				$this->_venue->author_ip		= '';
+				$this->_venue->locimage			= '';
+				$this->_venue->meta_keywords	= '';
+				$this->_venue->meta_description	= '';
+			}
 
 		}
 
@@ -341,9 +353,12 @@ class EventListModelEditvenue extends JModel
 			return false;
 		}
 
+		// manage mailing
 		jimport('joomla.utilities.mail');
 
-		$link 	= JURI::base().JRoute::_('index.php?view=details&id='.$row->id, false);
+		$link 	= JRoute::_(JURI::base().'index.php?view=details&id='.$row->id, false);
+    // strip description from tags / scripts, etc...
+    $text_description = JFilterOutput::cleanText($row->locdescription);
 
 		//create mail
 		if (($elsettings->mailinform == 2) || ($elsettings->mailinform == 3)) {
@@ -356,13 +371,13 @@ class EventListModelEditvenue extends JModel
 
 				$modified_ip 	= getenv('REMOTE_ADDR');
 				$edited 		= JHTML::Date( $row->modified, JText::_( 'DATE_FORMAT_LC2' ) );
-				$mailbody 		= JText::sprintf('MAIL EDIT VENUE', $user->name, $user->username, $user->email, $modified_ip, $edited, $row->venue, $row->url, $row->street, $row->plz, $row->city, $row->country, $row->locdescription, $state);
+				$mailbody 		= JText::sprintf('MAIL EDIT VENUE', $user->name, $user->username, $user->email, $modified_ip, $edited, $row->venue, $row->url, $row->street, $row->plz, $row->city, $row->country, $text_description, $state);
 				$mail->setSubject( $SiteName.JText::_( 'EDIT VENUE MAIL' ) );
 
 			} else {
 
 				$created 		= JHTML::Date( $row->modified, JText::_( 'DATE_FORMAT_LC2' ) );
-				$mailbody 		= JText::sprintf('MAIL NEW VENUE', $user->name, $user->username, $user->email, $row->author_ip, $created, $row->venue, $row->url, $row->street, $row->plz, $row->city, $row->country, $row->locdescription, $state);
+				$mailbody 		= JText::sprintf('MAIL NEW VENUE', $user->name, $user->username, $user->email, $row->author_ip, $created, $row->venue, $row->url, $row->street, $row->plz, $row->city, $row->country, $text_description, $state);
 				$mail->setSubject( $SiteName.JText::_( 'NEW VENUE MAIL' ) );
 
 			}
@@ -386,13 +401,13 @@ class EventListModelEditvenue extends JModel
 			If ($edited) {
 
 				$edited 		= JHTML::Date( $row->modified, JText::_( 'DATE_FORMAT_LC2' ) );
-				$mailbody 		= JText::sprintf('USER MAIL EDIT VENUE', $user->name, $user->username, $edited, $row->venue, $row->url, $row->street, $row->plz, $row->city, $row->country, $row->locdescription, $state);
+				$mailbody 		= JText::sprintf('USER MAIL EDIT VENUE', $user->name, $user->username, $edited, $row->venue, $row->url, $row->street, $row->plz, $row->city, $row->country, $text_description, $state);
 				$usermail->setSubject( $SiteName.JText::_( 'EDIT USER VENUE MAIL' ) );
 
 			} else {
 
 				$created 		= JHTML::Date( $row->modified, JText::_( 'DATE_FORMAT_LC2' ) );
-				$mailbody 		= JText::sprintf('USER MAIL NEW VENUE', $user->name, $user->username, $created, $row->venue, $row->url, $row->street, $row->plz, $row->city, $row->country, $row->locdescription, $state);
+				$mailbody 		= JText::sprintf('USER MAIL NEW VENUE', $user->name, $user->username, $created, $row->venue, $row->url, $row->street, $row->plz, $row->city, $row->country, $text_description, $state);
 				$usermail->setSubject( $SiteName.JText::_( 'NEW USER VENUE MAIL' ) );
 
 			}

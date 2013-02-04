@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: default_attendees.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: default_attendees.php 1082 2009-07-22 11:18:13Z schlu $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -21,10 +21,7 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
-
-
-JPluginHelper::importPlugin( 'eventlist' );
-$dispatcher =& JDispatcher::getInstance();      
+    
 ?>
 <h2 class="register"><?php echo JText::_( 'REGISTERED USERS' ).':'; ?></h2>
 
@@ -42,23 +39,23 @@ foreach ($this->registers as $register) :
 	//if CB
 	$text = '';
 	// is a plugin catching this ?
-  if ($res = $dispatcher->trigger( 'onAttendeeDisplay', array( $register->uid, &$text )))
+  if ($res = $this->dispatcher->trigger( 'onAttendeeDisplay', array( $register->uid, &$text )))
   {
   	 echo '<li>'.$text.'</li>';
   }
 	else if ($this->elsettings->comunsolution == 1) :
 
-		$thumb_path = 'images/comprofiler/tn';
-		$no_photo 	= ' alt="'.$register->name.'"';
-
+		$useravatar = JHTML::_('image.site', 'tn'.$register->avatar, 'images/comprofiler/', NULL, NULL, $register->name);
+		$nouseravatar = JHTML::_('image.site', 'tnnophoto.jpg', 'components/com_comprofiler/images/english/', NULL, NULL, $register->name);
+		
 		if ($this->elsettings->comunoption == 1) :
 			//User has avatar
 			if(!empty($register->avatar)) :
-				echo "<li><a href='".JRoute::_('index.php?option=com_comprofiler&task=userProfile&user='.$register->uid )."'><img src=".$thumb_path.$register->avatar.$no_photo." alt='no photo' /><span class='username'>".$register->name."</span></a></li>";
+				echo "<li><a href='".JRoute::_('index.php?option=com_comprofiler&task=userProfile&user='.$register->uid )."'>".$useravatar."<span class='username'>".$register->name."</span></a></li>";
 
 			//User has no avatar
 			else :
-				echo "<li><a href='".JRoute::_( 'index.php?option=com_comprofiler&task=userProfile&user='.$register->uid )."'><img src=\"components/com_comprofiler/images/english/tnnophoto.jpg\" alt=\"no photo\" /><span class='username'>".$register->name."</span></a></li>";
+				echo "<li><a href='".JRoute::_( 'index.php?option=com_comprofiler&task=userProfile&user='.$register->uid )."'>".$nouseravatar."<span class='username'>".$register->name."</span></a></li>";
 			endif;
 		endif;
 

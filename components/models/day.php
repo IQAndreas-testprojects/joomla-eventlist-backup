@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: day.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: day.php 1015 2009-04-23 20:00:43Z schlu $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -84,7 +84,7 @@ class EventListModelDay extends JModel
 
 		// Get the filter request variables
 		$this->setState('filter_order', JRequest::getCmd('filter_order', 'a.dates'));
-		$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'ASC'));
+		$this->setState('filter_order_dir', JRequest::getWord('filter_order_Dir', 'ASC'));
 			
 		$rawday = JRequest::getInt('id', 0, 'request');
 		$this->setDate($rawday);
@@ -240,6 +240,9 @@ class EventListModelDay extends JModel
 	{
 		$filter_order		= $this->getState('filter_order');
 		$filter_order_dir	= $this->getState('filter_order_dir');
+		
+		$filter_order		= JFilterInput::clean($filter_order, 'cmd');
+		$filter_order_dir	= JFilterInput::clean($filter_order_dir, 'word');
 
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir.', a.dates, a.times';
 
@@ -270,7 +273,7 @@ class EventListModelDay extends JModel
 		$where .= ' AND c.access <= '.$gid;
 		
 		// Third is to only select events of the specified day
-		$where .= ' AND (\''.$this->_date.'\' BETWEEN (a.dates) AND (IF (a.enddates >= now(), a.enddates, \''.$nulldate.'\')) OR \''.$this->_date.'\' = a.dates)';
+		$where .= ' AND (\''.$this->_date.'\' BETWEEN (a.dates) AND (IF (a.enddates >= a.dates, a.enddates, a.dates)) OR \''.$this->_date.'\' = a.dates)';
 
 		/*
 		 * If we have a filter, and this is enabled... lets tack the AND clause

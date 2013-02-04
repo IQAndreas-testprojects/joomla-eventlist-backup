@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: view.html.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: view.html.php 1006 2009-04-21 20:31:53Z schlu $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -99,7 +99,7 @@ class EventListViewDay extends JView
 		if ($maintainer || $genaccess ) $dellink = 1;
 
 		//add alternate feed link
-		$link    = 'index.php?option=com_eventlist&view=eventlist&format=feed';
+		$link    = 'index.php?option=com_eventlist&view=day&format=feed&id=' . date('Ymd', strtotime($this->get('Day')));
 		$attribs = array('type' => 'application/rss+xml', 'title' => 'RSS 2.0');
 		$document->addHeadLink(JRoute::_($link.'&type=rss'), 'alternate', 'rel', $attribs);
 		$attribs = array('type' => 'application/atom+xml', 'title' => 'Atom 1.0');
@@ -172,7 +172,7 @@ class EventListViewDay extends JView
 		$filter_order		= JRequest::getCmd('filter_order', 'a.dates');
 		$filter_order_Dir	= JRequest::getWord('filter_order_Dir', 'ASC');
 
-		$filter				= JRequest::getString('filter');
+		$filter				= $this->escape(JRequest::getString('filter'));
 		$filter_type		= JRequest::getString('filter_type');
 
 		$sortselects = array();

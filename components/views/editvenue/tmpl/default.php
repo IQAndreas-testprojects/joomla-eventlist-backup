@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: default.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: default.php 1004 2009-04-16 08:45:31Z julienv $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -110,7 +110,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			?>
 			elsubmitform(pressbutton);
 
-			return true;
+			return false;
 		}
 	}
 	

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: uninstall.eventlist.php 1101 2009-07-26 19:18:56Z schlu $
+ * @version 1.0 $Id: default.php 958 2009-02-02 17:23:05Z julienv $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -20,13 +20,28 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-
-/**
- * Executes additional uninstallation processes
- *
- * @since 0.1
- */
-function com_uninstall() {
-echo "<strong>Joomla! EventList uninstalled</strong>";
-}
 ?>
+<div id="eventlist" class="el_eventlist">
+
+<?php if ($this->params->def( 'show_page_title', 1 )) : ?>
+
+    <h1 class="componentheading">
+		<?php echo $this->escape($this->pagetitle); ?>
+	</h1>
+
+<?php endif; ?>
+
+<!--table-->
+
+<?php echo $this->loadTemplate('events'); ?>
+
+<?php echo $this->loadTemplate('venues'); ?>
+
+<?php echo $this->loadTemplate('attending'); ?>
+<!--footer-->
+
+<p class="copyright">
+  <?php echo ELOutput::footer( ); ?>
+</p>
+
+</div>

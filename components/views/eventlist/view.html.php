@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: view.html.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: view.html.php 1006 2009-04-21 20:31:53Z schlu $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -122,8 +122,7 @@ class EventListViewEventList extends JView
 		}
 
 		// Create the pagination object
-		jimport('joomla.html.pagination');
-		$pageNav = new JPagination($total, $limitstart, $limit);
+		$pageNav = & $this->get('Pagination');
 
 		$this->assign('lists' , 					$lists);
 		$this->assign('total',						$total);
@@ -184,13 +183,19 @@ class EventListViewEventList extends JView
 		$filter_order		= JRequest::getCmd('filter_order', 'a.dates');
 		$filter_order_Dir	= JRequest::getWord('filter_order_Dir', 'ASC');
 
-		$filter				= JRequest::getString('filter');
+		$filter				= $this->escape(JRequest::getString('filter'));
 		$filter_type		= JRequest::getString('filter_type');
 
 		$sortselects = array();
-		$sortselects[]	= JHTML::_('select.option', 'title', $elsettings->titlename );
+		if ($elsettings->showtitle == 1) {
+		  $sortselects[]	= JHTML::_('select.option', 'title', $elsettings->titlename );
+		}
+    if ($elsettings->showlocate == 1) {
 		$sortselects[] 	= JHTML::_('select.option', 'venue', $elsettings->locationname );
+    }
+    if ($elsettings->showcity == 1) {
 		$sortselects[] 	= JHTML::_('select.option', 'city', $elsettings->cityname );
+    }
 		if ($elsettings->showcat) {
 			$sortselects[] 	= JHTML::_('select.option', 'type', $elsettings->catfroname );
 		}

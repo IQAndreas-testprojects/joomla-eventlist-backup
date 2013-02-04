@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: updatecheck.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: updatecheck.php 1072 2009-06-29 12:28:50Z schlu $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -93,7 +93,7 @@ class EventListModelUpdatecheck extends JModel
 			$_updatedata->changes 		= explode(';', $data[6]);
 			$_updatedata->failed 		= 0;
 
-			$_updatedata->current = version_compare( '1.0.0', $_updatedata->version );
+			$_updatedata->current = version_compare( '1.0.1', $_updatedata->version );
 
 		}
 

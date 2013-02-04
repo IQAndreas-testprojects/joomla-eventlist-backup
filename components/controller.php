@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: controller.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: controller.php 1095 2009-07-23 17:52:50Z schlu $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -62,8 +62,11 @@ class EventListController extends JController
 	 */
 	function cancelevent()
 	{
-		$user	= & JFactory::getUser();
-		$id		= JRequest::getInt( 'id');
+		$user		= & JFactory::getUser();
+		$id			= JRequest::getInt( 'id');
+		$session 	= & JFactory::getSession();
+		
+		$session->clear('eventform', 'com_eventlist');
 
 		// Must be logged in
 		if ($user->get('id') < 1) {
@@ -95,6 +98,11 @@ class EventListController extends JController
 	{
 		$user	= & JFactory::getUser();
 		$id		= JRequest::getInt( 'id');
+		
+		$post = JRequest::get( 'post' );
+		//sticky forms
+		$session = &JFactory::getSession();
+		$session->set('eventform', $post, 'com_eventlist');
 
 		// Must be logged in
 		if ($user->get('id') < 1) {
@@ -122,6 +130,9 @@ class EventListController extends JController
 	{
 		$user	= & JFactory::getUser();
 		$id		= JRequest::getInt( 'id' );
+		$session 	= & JFactory::getSession();
+		
+		$session->clear('venueform', 'com_eventlist');
 
 		// Must be logged in
 		if ($user->get('id') < 1) {
@@ -157,8 +168,12 @@ class EventListController extends JController
 		//Sanitize
 		$post = JRequest::get( 'post' );
 		$post['locdescription'] = JRequest::getVar( 'locdescription', '', 'post', 'string', JREQUEST_ALLOWRAW );
+		
+		//sticky forms
+		$session = &JFactory::getSession();
+		$session->set('venueform', $post, 'com_eventlist');
 
-    $isNew = ($post['id']) ? false : true;
+    	$isNew = ($post['id']) ? false : true;
     
 		$file 		= JRequest::getVar( 'userfile', '', 'files', 'array' );
 
@@ -169,17 +184,20 @@ class EventListController extends JController
 			$msg 	= JText::_( 'VENUE SAVED' );
 			$link 	= JRoute::_('index.php?view=venueevents&id='.$returnid, false) ;
 			
-      JPluginHelper::importPlugin( 'eventlist' );
-      $dispatcher =& JDispatcher::getInstance();
-      $res = $dispatcher->trigger( 'onVenueEdited', array( $returnid, $isNew ) ); 
+      		JPluginHelper::importPlugin( 'eventlist' );
+      		$dispatcher =& JDispatcher::getInstance();
+      		$res = $dispatcher->trigger( 'onVenueEdited', array( $returnid, $isNew ) ); 
       
 			$cache = &JFactory::getCache('com_eventlist');
 			$cache->clean();
+			
+			$session->clear('venueform', 'com_eventlist');
 
 		} else {
 
 			$msg 		= JText::_( 'FAILED SAVING VENUE' );
-			$link = JRequest::getString('referer', JURI::base(), 'post');
+			//back to form
+			$link 	= JRoute::_('index.php?view=editvenue', false) ;
 
 			JError::raiseWarning('SOME_ERROR_CODE', $model->getError() );
 		}
@@ -201,12 +219,16 @@ class EventListController extends JController
 		// Check for request forgeries
 		JRequest::checkToken() or die( 'Invalid Token' );
 		
-    $elsettings = & ELHelper::config();
+    	$elsettings = & ELHelper::config();
 		$user = & JFactory::getUser();
 		
 		//get image
 		$file 		= JRequest::getVar( 'userfile', '', 'files', 'array' );
 		$post 		= JRequest::get( 'post' );
+		
+		//sticky forms
+		$session = &JFactory::getSession();
+		$session->set('eventform', $post, 'com_eventlist');
 		
 		$isNew = ($post['id']) ? false : true;
 
@@ -217,10 +239,9 @@ class EventListController extends JController
 			$msg 	= JText::_( 'EVENT SAVED' );
 			
 			if ($elsettings->showdetails) {
-			  $link 	= JRoute::_('index.php?view=details&id='.$returnid, false) ;
-			}
-			else {
-        $link = JRequest::getString('referer', JURI::base(), 'post');				
+			  	$link 	= JRoute::_('index.php?view=details&id='.$returnid, false) ;
+			} else {
+        		$link = JRequest::getString('referer', JURI::base(), 'post');				
 			}
 			
 			JPluginHelper::importPlugin( 'eventlist' );
@@ -229,11 +250,15 @@ class EventListController extends JController
 
 			$cache = &JFactory::getCache('com_eventlist');
 			$cache->clean();
+			
+			$session->clear('eventform', 'com_eventlist');
 
 		} else {
 
 			$msg 		= '';
-			$link = JRequest::getString('referer', JURI::base(), 'post');
+			//$link = JRequest::getString('referer', JURI::base(), 'post');
+			//back to form
+			$link 	= JRoute::_('index.php?view=editevent', false) ;
 
 			JError::raiseWarning('SOME_ERROR_CODE', $model->getError() );
 		}
@@ -261,9 +286,9 @@ class EventListController extends JController
 		$model->setId($id);
 		$model->userregister();
 				
-    JPluginHelper::importPlugin( 'eventlist' );
-    $dispatcher =& JDispatcher::getInstance();
-    $res = $dispatcher->trigger( 'onEventUserRegistered', array( $id ) );   
+    	JPluginHelper::importPlugin( 'eventlist' );
+    	$dispatcher =& JDispatcher::getInstance();
+   		$res = $dispatcher->trigger( 'onEventUserRegistered', array( $id ) );   
 
 		$cache = &JFactory::getCache('com_eventlist');
 		$cache->clean();
@@ -296,9 +321,9 @@ class EventListController extends JController
 
 		$msg = JText::_( 'UNREGISTERED SUCCESSFULL' );
 		
-    JPluginHelper::importPlugin( 'eventlist' );
-    $dispatcher =& JDispatcher::getInstance();
-    $res = $dispatcher->trigger( 'onEventUserUnregistered', array( $id ) ); 
+    	JPluginHelper::importPlugin( 'eventlist' );
+    	$dispatcher =& JDispatcher::getInstance();
+    	$res = $dispatcher->trigger( 'onEventUserUnregistered', array( $id ) ); 
     
 		$this->setRedirect( JRoute::_('index.php?view=details&id='.$id, false), $msg );
 	}

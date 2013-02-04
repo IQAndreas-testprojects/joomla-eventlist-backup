@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: default.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: default.php 1004 2009-04-16 08:45:31Z julienv $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -116,7 +116,7 @@ defined('_JEXEC') or die('Restricted access');
 				submit_unlimited();
 				elsubmitform(pressbutton);
 
-				return true;
+				return false;
 			}
 		}
 		
@@ -186,7 +186,7 @@ defined('_JEXEC') or die('Restricted access');
                   <?php echo JText::_( 'TITLE' ).':'; ?>
               </label>
 
-              <input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->row->title); ?>" size="65" maxlength="60" />
+              <input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->row->title; ?>" size="65" maxlength="60" />
           </div>
 
           <div class="el_venue floattext">
@@ -278,12 +278,12 @@ defined('_JEXEC') or die('Restricted access');
               <p><strong><?php echo JText::_( 'SUBMIT REGISTER' ).':'; ?></strong></p>
 
               <label for="registra0"><?php echo JText::_( 'NO' ); ?></label>
-        			<input type="radio" name="registra" id="registra0" value="0" checked="checked" />
+        			<input type="radio" name="registra" id="registra0" value="0" <?php echo (!$this->row->registra) ? 'checked="checked"': ''; ?> />
 
         			<br class="clear" />
 
               <label for="registra1"><?php echo JText::_( 'YES' ); ?></label>
-            	<input type="radio" name="registra" id="registra1" value="1" />
+            	<input type="radio" name="registra" id="registra1" value="1" <?php echo ($this->row->registra) ? 'checked="checked"': ''; ?>/>
           </div>
       		<?php
       		//register end
@@ -295,12 +295,12 @@ defined('_JEXEC') or die('Restricted access');
         			<p><strong><?php echo JText::_( 'SUBMIT UNREGISTER' ).':'; ?></strong></p>
 
             	<label for="unregistra0"><?php echo JText::_( 'NO' ); ?></label>
-        			<input type="radio" name="unregistra" id="unregistra0" value="0" checked="checked" />
+        			<input type="radio" name="unregistra" id="unregistra0" value="0" <?php echo (!$this->row->unregistra) ? 'checked="checked"': ''; ?> />
 
         			<br class="clear" />
 
             	<label for="unregistra1"><?php echo JText::_( 'YES' ); ?></label>
-            	<input type="radio" name="unregistra" id="unregistra1" value="1" />
+            	<input type="radio" name="unregistra" id="unregistra1" value="1" <?php echo ($this->row->unregistra) ? 'checked="checked"': ''; ?>/>
       		</div>
       		<?php
       		//unregister end

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: details.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: details.php 999 2009-04-13 12:08:23Z julienv $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -121,15 +121,18 @@ class EventListModelDetails extends JModel
 			// Get the WHERE clause
 			$where	= $this->_buildDetailsWhere();
 
-			$query = 'SELECT a.id AS did, a.dates, a.enddates, a.title, a.times, a.endtimes, a.datdescription, a.meta_keywords, a.meta_description, a.datimage, a.registra, a.unregistra, a.locid, a.catsid, a.created_by,'
+			$query = 'SELECT a.id AS did, a.dates, a.enddates, a.title, a.times, a.endtimes, '
+			    . ' a.datdescription, a.meta_keywords, a.meta_description, a.datimage, a.registra, a.unregistra, a.locid, a.catsid, a.created_by,'
 					. ' l.id AS locid, l.venue, l.city, l.state, l.url, l.locdescription, l.locimage, l.city, l.plz, l.street, l.country, l.map, l.created_by AS venueowner,'
-					. ' c.id, c.catname, c.published, c.access,'
+					. ' c.id, c.catname, c.published, c.access, '
+          . ' u.name AS creator_name, u.username AS creator_username,'
 					. ' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as slug,'
 					. ' CASE WHEN CHAR_LENGTH(l.alias) THEN CONCAT_WS(\':\', a.locid, l.alias) ELSE a.locid END as venueslug,'
 					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 					. ' FROM #__eventlist_events AS a'
 					. ' LEFT JOIN #__eventlist_venues AS l ON a.locid = l.id'
 					. ' LEFT JOIN #__eventlist_categories AS c ON c.id = a.catsid'
+          . ' LEFT JOIN #__users AS u ON u.id = a.created_by'
 					. $where
 					;
     		$this->_db->setQuery($query);

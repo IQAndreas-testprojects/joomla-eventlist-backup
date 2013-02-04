@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: event.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: event.php 1005 2009-04-16 10:09:57Z julienv $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -275,13 +275,13 @@ class EventListModelEvent extends JModel
 			return false;
 		}
 		
-		// Check/sanitize the metatags
-		$row->meta_description = htmlspecialchars(trim(addslashes($row->meta_description)));
+		// Check/sanitize the metatags => done in joomla filterinput
+		//$row->meta_description = htmlspecialchars(trim(addslashes($row->meta_description)));
 		if (JString::strlen($row->meta_description) > 255) {
 			$row->meta_description = JString::substr($row->meta_description, 0, 254);
 		}
-
-		$row->meta_keywords = htmlspecialchars(trim(addslashes($row->meta_keywords)));
+    // sanitize  => done in joomla filterinput
+		//$row->meta_keywords = htmlspecialchars(trim(addslashes($row->meta_keywords)));
 		if (JString::strlen($row->meta_keywords) > 200) {
 			$row->meta_keywords = JString::substr($row->meta_keywords, 0, 199);
 		}

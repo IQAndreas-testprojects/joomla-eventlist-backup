@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: install.eventlist.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: install.eventlist.php 1101 2009-07-26 19:18:56Z schlu $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -89,14 +89,14 @@ function com_install() {
 			<?php
 			if (($direxists) || ($makedir)) {
 			?>
-				<font color="green"><b>Joomla! EventList 1.0 Beta Installed Successfully!</b></font><br />
+				<font color="green"><b>Joomla! EventList Installed Successfully!</b></font><br />
 				Ensure that EventList has write access to the directories shown above! Have Fun.
 				</code>
 			<?php
 			} else {
 			?>
 				<font color="red">
-				<b>Joomla! EventList 1.0 Beta could NOT be installed successfully!</b>
+				<b>Joomla! EventList could NOT be installed successfully!</b>
 				</font>
 				<br /><br />
 				Please check following directories:<br />

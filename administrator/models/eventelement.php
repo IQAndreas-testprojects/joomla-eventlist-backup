@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: eventelement.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: eventelement.php 1072 2009-06-29 12:28:50Z schlu $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -65,8 +65,8 @@ class EventListModelEventelement extends JModel
 
 		global $mainframe, $option;
 
-    $limit      = $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
-    $limitstart = $mainframe->getUserStateFromRequest( $option.JRequest::getCmd( 'view').'.limitstart', 'limitstart', 0, 'int' );
+    	$limit      = $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
+    	$limitstart = $mainframe->getUserStateFromRequest( $option.JRequest::getCmd( 'view').'.limitstart', 'limitstart', 0, 'int' );
 		
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
@@ -83,9 +83,9 @@ class EventListModelEventelement extends JModel
 		// Lets load the content if it doesn't already exist
 		if (empty($this->_data))
 		{
-      $this->getPagination(); // do it first to get the proper limits !
-      $query = $this->_buildQuery();
-      $this->_data = $this->_getList($query, $this->_pagination->limitstart, $this->_pagination->limit);
+      		$this->getPagination(); // do it first to get the proper limits !
+      		$query = $this->_buildQuery();
+      		$this->_data = $this->_getList($query, $this->_pagination->limitstart, $this->_pagination->limit);
 		}
 
 		return $this->_data;
@@ -162,6 +162,9 @@ class EventListModelEventelement extends JModel
 
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.eventelement.filter_order', 'filter_order', 'a.dates', 'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.eventelement.filter_order_Dir', 'filter_order_Dir', '', 'word' );
+
+		$filter_order		= JFilterInput::clean($filter_order, 'cmd');
+		$filter_order_Dir	= JFilterInput::clean($filter_order_Dir, 'word');
 
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', a.dates';
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: default.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: default.php 1021 2009-04-27 08:56:08Z julienv $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -35,6 +35,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php if ($this->params->def('show_page_title', 1)) : ?>
 	<h1 class='componentheading'>
 		<?php echo $this->escape($this->pagetitle); ?>
+    <?php echo ELOutput::editbutton($this->item->id, $this->venue->id, $this->params, $this->allowedtoeditvenue, 'editvenue' ); ?>
 	</h1>
 <?php endif; ?>
 

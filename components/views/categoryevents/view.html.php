@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: view.html.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: view.html.php 1006 2009-04-21 20:31:53Z schlu $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -195,7 +195,7 @@ class EventListViewCategoryevents extends JView
 		$filter_order		= JRequest::getCmd('filter_order', 'a.dates');
 		$filter_order_Dir	= JRequest::getCmd('filter_order_Dir', 'ASC');
 
-		$filter				= JRequest::getString('filter');
+		$filter				= $this->escape(JRequest::getString('filter'));
 		$filter_type		= JRequest::getString('filter_type');
 
 		$sortselects = array();

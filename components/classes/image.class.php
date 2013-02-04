@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: image.class.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: image.class.php 1008 2009-04-22 16:29:36Z julienv $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -270,7 +270,7 @@ class ELImage {
 		}
 
 		//check if the imagefiletype is valid
-		$fileext 	= JFile::getExt($file['name']);
+		$fileext 	= strtolower(JFile::getExt($file['name']));
 
 		$allowable 	= array ('gif', 'jpg', 'png');
 		if (!in_array($fileext, $allowable)) {

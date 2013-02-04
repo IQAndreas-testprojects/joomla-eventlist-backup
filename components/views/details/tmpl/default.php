@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: default.php 958 2009-02-02 17:23:05Z julienv $
+ * @version 1.0 $Id: default.php 1023 2009-04-27 15:21:09Z julienv $
  * @package Joomla
  * @subpackage EventList
  * @copyright (C) 2005 - 2009 Christoph Lukes
@@ -21,6 +21,7 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
 ?>
 <div id="eventlist" class="event_id<?php echo $this->row->did; ?> el_details">
 	<p class="buttons">
@@ -102,9 +103,25 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
     		<dd class="category">
 				<?php echo "<a href='".JRoute::_( 'index.php?view=categoryevents&id='.$this->row->categoryslug )."'>".$this->escape($this->row->catname)."</a>";?>
 			</dd>
+			
+	<?php
+	// is a plugin catching the display of creator ?
+  $obj = new stdClass();
+  // is a plugin catching this ?
+  if ($res = $this->dispatcher->trigger( 'onEventCreatorDisplay', array( $this->row->created_by, $obj )))
+  {
+     ?>
+     <dt class="creator"><?php echo JText::_( 'PROPOSED BY' ).':'; ?></dt>
+        <dd class="creator">
+        <?php echo $obj->text;?>
+      </dd>
+     <?php
+  }
+  ?>
+  
 	</dl>
-
-
+<!-- END of event summary section -->
+	
   	<?php if ($this->elsettings->showevdescription == 1) : ?>
 
   	    <h2 class="description"><?php echo JText::_( 'DESCRIPTION' ); ?></h2>
@@ -205,7 +222,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 	<?php endif; ?>
 	
-	<?php if ($this->elsettings->commentsystem != 0) :	?>
+	<?php if ($this->elsettings->commentsystem != 0 && !$this->params->get('pop', 0)) :	?>
 	
 		<!-- Comments -->
 		<?php echo $this->loadTemplate('comments'); ?>
