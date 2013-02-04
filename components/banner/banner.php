@@ -45,7 +45,7 @@ class Banner
             if ($text && strlen($text->lunch_text))
             {
             	$date_text = strftime(DATEFORMAT_TIME_TEXT); //NOW by default
-                Banner::showBanner($text->lunch_text, $text->altlunch_text, $banner->price_text, $banner->time_text, $date_text, $banner->banner_url, $banner->background_image);
+                Banner::showBanner($text->lunch_text, $text->altlunch_text, $banner->price_text, $banner->time_text, $date_text, $banner->site_url, $banner->background_image, $banner->name);
 
                 //Show edit button if current owner or administrator
                 if ($admin || ($user->id == $banner->owner))
@@ -63,7 +63,7 @@ class Banner
                 {
                     echo '<a href="http://stadsaktuellt.nu/index.php?option=com_eventlist&task=edit_banner&id='.$banner->id.'">';
                     echo '<img src="'.EDIT_IMAGE.'" />';
-                    echo '&nbsp;' . NO_BANNER_TEXT_TODAY;
+                    echo '&nbsp;' . Banner::makeHTML($banner->name) . '&nbsp; - &nbsp;' . NO_BANNER_TEXT_TODAY;
                     echo '</a>';
                 }
             }
@@ -89,25 +89,28 @@ class Banner
         	if (!strlen($date_text))
         		{ $date_text = strftime(DATEFORMAT_TIME_TEXT); } //NOW by default
         	
-            Banner::displayCustomBanner($lunch_text, $altlunch_text, $banner->price_text, $banner->time_text, $date_text, $banner->banner_url, $banner->background_image);
+       		Banner::displayCustomBanner($lunch_text, $altlunch_text, $banner->price_text, $banner->time_text, $date_text, $banner->site_url, $banner->background_image, $banner->name);
         }
     }
     
     
     //Excludes the edit button ETC or any database access
-    public static function displayCustomBanner($lunch_text, $altlunch_text, $price_text, $time_text, $date_text, $banner_url, $background_image)
+    public static function displayCustomBanner($lunch_text, $altlunch_text, $price_text, $time_text, $date_text, $site_url, $background_image, $image_alt = "")
     {
     	// Import CSS
         echo '<link rel="stylesheet" type="text/css" href="'.BANNER_CSS.'" />';
     	echo '<div id="dagens_container">';
-		Banner::showBanner($lunch_text, $altlunch_text, $price_text, $time_text, $date_text, $banner_url, $background_image);
+		Banner::showBanner($lunch_text, $altlunch_text, $price_text, $time_text, $date_text, $site_url, $background_image, $image_alt);
 		echo '</div>';
     }
     
 
 
-    static function showBanner($lunch_text, $altlunch_text, $price_text, $time_text, $date_text, $banner_url, $background_image)
+    static function showBanner($lunch_text, $altlunch_text, $price_text, $time_text, $date_text, $site_url, $background_image, $image_alt = "")
     {
+    	//Now, make it into a giant link!!
+    	echo '<a href="'.$site_url.'">';
+    	
     	echo '<table class="dagens" cellpadding="0" cellspacing="0">';
 		echo '<tr class="head">';
 			echo '<td class="spacer">&nbsp;</td>';
@@ -117,7 +120,7 @@ class Banner
 		echo '</tr>';
 		echo '<tr class="annons">';
 			echo '<td class="spacer">&nbsp;</td>';
-			echo '<td><img src="'.$background_image.'" alt="" class="dagens" /></td>';
+			echo '<td><img src="'.BANNER_IMAGE_ROOT_URL.$background_image.'" alt="'.Banner::makeHTML($image_alt).'" class="dagens" /></td>';
 			echo '<td>';
 				echo '<h1>'.Banner::makeHTML($lunch_text).'</h1>';
 				echo '<h2>'.Banner::makeHTML($altlunch_text).'</h2>';
@@ -126,11 +129,13 @@ class Banner
 		echo '</tr>';
 		echo '<tr class="footer">';
 			echo '<td class="spacer">&nbsp;</td>';
-			echo '<td class="left_footer">'.Banner::makeHTML($time_text).'</td>';
+			echo '<td class="left_footer">'.Banner::makeHTML(PREFIX_TIME_TEXT.$time_text).'</td>';
 			echo '<td class="right_footer">'.Banner::makeHTML($price_text).'</td>';
 			echo '<td class="spacer">&nbsp;</td>';
 		echo '</tr>';
 		echo '</table>';
+		
+		echo '</a>';
     }
     
     public static function makeHTML($string)

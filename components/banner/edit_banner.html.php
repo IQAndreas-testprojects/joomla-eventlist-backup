@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 defined('BANNER') or die('Restricted access');
@@ -16,20 +16,19 @@ $bannerEditURL = "index.php?option=com_eventlist&task=edit_banner&id=".$banner_i
     Banner::displayBannerByID($banner_id, JRequest::getString('lunch_text', SAMPLE_LUNCH_TEXT), JRequest::getString('altlunch_text', SAMPLE_ALTLUNCH_TEXT), JRequest::getString('date_text', "")); //Show with sample text
 ?>
 <!-- EDIT BANNER SETTINGS -->
+<br />
 <form action="<?php echo $bannerEditURL; ?>" method="post">
-    <input type="submit" value="<?php echo EDIT_BANNER_DESIGN; ?>" />
-    <input type="hidden" name="action" value="settings" />
+    <p><input type="submit" value="<?php echo EDIT_BANNER_DESIGN; ?>" /></p>
+    <p><input type="hidden" name="action" value="settings" /></p>
 </form>
-
+<br />
 
 <!-- EDIT DAILY TEXT SETTINGS -->
 <?php 
 	BannerActions::showEditBannerText();
-?>
-
-<?php 
+?><?php 
 $currentMonth = date("n");
-$displayedMonth = JRequest::getInt("m", $currentMonth);
+$displayedMonth = JRequest::getInt("m", $currentMonth, "&nbsp;");
 
 $currentYear = date("Y");
 $displayedYear = JRequest::getInt("Y", $currentYear);
@@ -37,4 +36,3 @@ $displayedYear = JRequest::getInt("Y", $currentYear);
 BannerActions::showMonthSelector($bannerEditURL, $displayedMonth, $displayedYear);
 BannerActions::showBannerTextTableByMonth($banner_id, $displayedMonth, $displayedYear, $bannerEditURL);
 ?>
-

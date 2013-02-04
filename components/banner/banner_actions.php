@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 //Define the constant that allows other pages to be viewed
 define('BANNER', JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner');
@@ -292,14 +292,22 @@ class BannerActions
     {
         echo '<div class="elbanner_monthselector">';
 
-	        //Previous month
-	        echo '<span class="elbanner_month">'.BannerActions::monthText($baseURL, $month-1, $year).'</span>';
+	        //Previous month - DISABLED
+	        //echo '<span class="elbanner_month">'.BannerActions::monthText($baseURL, $month-1, $year).' &nbsp; </span>';
 	        
+        	$currentMonth = intval(date('m'));
+        	$currentYear = intval(date('Y'));
+        	if (($currentMonth != $month) || ($currentYear != $year))
+        	{
+        		//Current month
+	        	echo '<span class="elbanner_month">'.BannerActions::monthText($baseURL, $currentMonth, $currentYear).' &nbsp; </span>';
+        	}
+        
 	        //Current month
-	        echo '<span class="elbanner_current_month">'.BannerActions::monthText($baseURL, $month, $year).'</span>';
+	        echo '<span class="elbanner_current_month">'.BannerActions::monthText($baseURL, $month, $year).' &nbsp; </span>';
 	        
 	        //Next two months
-	        echo '<span class="elbanner_month">'.BannerActions::monthText($baseURL, $month+1, $year).'</span>';
+	        echo '<span class="elbanner_month">'.BannerActions::monthText($baseURL, $month+1, $year).' &nbsp; </span>';
 	        echo '<span class="elbanner_month">'.BannerActions::monthText($baseURL, $month+2, $year).'</span>';
 		
         echo '</div>';
@@ -308,7 +316,7 @@ class BannerActions
     private static function monthText($baseURL, $month, $year)
     {
     	$url = $baseURL . "&m=".$month . "&y=".$year;
-    	return '<a href="'.$url.'">'.date("F Y", mktime(0,0,0, $month, 1, $year)).'</a>';
+    	return '<a href="'.$url.'">'.strftime(DATEFORMAT_MONTH_TEXT, mktime(0,0,0, $month, 1, $year)).'</a>';
     }
 
     
@@ -346,7 +354,7 @@ class BannerActions
     		$altlunchTextArray[$bannerText->day_of_month] = $bannerText->altlunch_text;
     	}
     	
-    	
+    	echo '<br />';
     	echo '<table>';
         for ($i = 1; $i <= $numDays; $i++)
     	{
@@ -358,11 +366,16 @@ class BannerActions
     		echo '<tr class="'.$class.'">';
     		
     		if ($editable)
-    			{ echo '<td><a href="'.$baseURL."&d=".$i.'"><img src="'.EDIT_IMAGE.'" /></a></td>'; }
+    			{ echo '<td valign="top"><a href="'.$baseURL."&d=".$i.'"><img src="'.EDIT_IMAGE.'" /></a></td>'; }
             
-    		echo '<td>'.$i.".".'</td>';	
-    		echo '<td>'.Banner::makeHTML($lunchTextArray[$i]).'</td>';
-    		echo '<td>'.Banner::makeHTML($altlunchTextArray[$i]).'</td>';
+    		echo '<td valign="top">'.$i.".".'</td>';	
+    		echo '<td valign="top">'.Banner::makeHTML($lunchTextArray[$i]).'</td>';
+    		echo '<td valign="top">'.Banner::makeHTML($altlunchTextArray[$i]).'</td>';
+    		
+    		echo '</tr>';
+    		
+    		echo '<tr height="5">';
+    		echo '<td colspan="4"> </td>';
     		
     		echo '</tr>';
     	}

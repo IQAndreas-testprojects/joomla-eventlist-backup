@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 defined('BANNER_ADMIN') or die('Restricted access');
@@ -23,10 +23,10 @@ $banner_category = JRequest::getInt('banner_category');
 		<?php echo BannerAdmin::getErrors('banner_category'); ?>
 	</span>
     
-    <?php echo LABEL_NAME; ?> <input type="text" name="banner_name" value="<?php echo htmlspecialchars($banner_name); ?>" width="120" maxlength="255" /><br/>
+    <?php echo LABEL_NAME; ?> <input type="text" name="banner_name" value="<?php echo htmlspecialchars($banner_name); ?>" width="120" maxlength="255" /><br /><br />
     
-    <?php echo LABEL_OWNER; BannerAdmin::showUsersDropdown($banner_owner, 'banner_owner'); ?><br/>
-    <?php echo LABEL_CATEGORY; BannerAdmin::showCategoriesDropdown($banner_category, 'banner_category'); ?><br/>
+    <?php echo LABEL_OWNER; BannerAdmin::showUsersDropdown($banner_owner, 'banner_owner'); ?><br /><br />
+    <?php echo LABEL_CATEGORY; BannerAdmin::showCategoriesDropdown($banner_category, 'banner_category'); ?><br /><br />
 
 	<?php 
 	

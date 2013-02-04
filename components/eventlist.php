@@ -44,20 +44,17 @@ $next_page = "";
 //or even import unless the task is actually set
 if ($task)
 {
-    require_once(JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner'.DS.'banner_actions.php');
-    
+
     switch ($task)
     {
         case "edit_banner" :
-            //This only allows you to edit the banner design and text
+            require_once(JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner'.DS.'banner_actions.php');
             $next_page = BannerActions::editBanner();
             break;
             
-        case "edit_banners" : 
-            //NOTE: edit_banners (plural) is VERY different
-            //This is the code only allowed to be modified by the 
-            //administrators to add or remove banners
-            $next_page = BannerActions::editBanners();
+        case "banner_admin" :
+            require_once(JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner'.DS.'banner_admin.php');
+            $next_page = BannerAdmin::editBanners();
             break;
 
         default :
