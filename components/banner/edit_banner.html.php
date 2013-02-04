@@ -6,9 +6,6 @@ defined('BANNER') or die('Restricted access');
 //Predefine commonly used variables
 $banner_id = JRequest::getInt('id');
 $bannerEditURL = "index.php?option=com_eventlist&task=edit_banner&id=".$banner_id;
-
-$categoryType = BannerActions::getBannerCategoryType($banner_id);
-
 ?>
 
 <?php 
@@ -29,18 +26,19 @@ $categoryType = BannerActions::getBannerCategoryType($banner_id);
 
 <!-- EDIT DAILY TEXT SETTINGS -->
 <?php 
-	BannerActions::showEditBannerText($categoryType);
+	BannerActions::showEditBannerText();
 ?>
 
 <?php 
 	//Show a different banner list depending on category!
 	
-	if ($categoryType == CTYPE_SINGLE)
+	$category = BannerActions::getBannerCategoryType($banner_id);
+	if ($category == CTYPE_SINGLE)
 	{
 		require(BANNER.DS.'edit_banner_textlist_single.html.php'); 
 	}
-	elseif ($categoryType == CTYPE_SPAN)
-	{
+	elseif ($category == CTYPE_SPAN)
+	{ 
 		require(BANNER.DS.'edit_banner_textlist_span.html.php'); 
 	}
 	else

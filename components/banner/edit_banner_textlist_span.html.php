@@ -10,10 +10,6 @@ $bannerEditURL = "index.php?option=com_eventlist&task=edit_banner&id=".$banner_i
 
 <?php 
 
-//Display the link for adding banners
-$addTextURL = $bannerEditURL . "&action=add_text";
-echo '<a href="'.$addTextURL.'">'.ADD_BANNER_TEXT.'</a><br/>';
-
 //Going to try something risky here and display ALL banners!
 BannerActions::showAllBannerTextTable($banner_id, $bannerEditURL);
 
