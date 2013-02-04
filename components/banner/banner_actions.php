@@ -4,13 +4,18 @@
 define('BANNER', JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner');
 
 //Define all redirect pages
-define('EDIT_BANNER',		   BANNER.DS.'edit_banner.html.php');
+define('BANNER_SUMMARY',		BANNER.DS.'banner_summary.html.php');
+define('EDIT_BANNER',		   	BANNER.DS.'edit_banner.html.php');
 define('EDIT_BANNER_SETTINGS',  BANNER.DS.'edit_banner_settings.html.php');
 
 //NOTE: This page is made to be embedded INSIDE "EDIT_BANNER",
 //not as standalone!
-define('EDIT_BANNER_TEXT',  BANNER.DS.'edit_banner_text.html.php');
+define('EDIT_BANNER_TEXT_SINGLE',  	BANNER.DS.'edit_banner_text_single.html.php');
+define('EDIT_BANNER_TEXT_SPAN',  	BANNER.DS.'edit_banner_text_span.html.php');
 
+
+//Might as well include the Banner class
+require_once(BANNER.DS.'banner.php');
 
 //Import the databse directly - it will be used in every function anyway
 require_once(BANNER.DS.'banner.db.php');
@@ -56,8 +61,16 @@ class BannerActions
 					case 'settings' :
 						return BannerActions::saveBannerSettings($banner);
 						break;
-					case 'text' :
-						return BannerActions::saveBannerText($banner);
+					case 'single_text' :
+						return BannerActions::saveBannerSingleText($banner);
+						break;
+					case 'span_text' :
+						return BannerActions::saveBannerSpanText($banner);
+						break;
+						
+					case 'add_text' :
+						//Only addable in span!!
+						return BannerActions::saveAddBannerText($banner);
 						break;
 
 					default :
@@ -77,20 +90,53 @@ class BannerActions
 					BannerActions::validateBannerSettings();
 					return EDIT_BANNER_SETTINGS;
 				}
-				elseif (JRequest::getCmd('action') == 'text')
+				elseif (JRequest::getCmd('action') == 'add_text')
+				{
+					//Originally for security, but with span banners,
+					//there are no open holes that this fixes. 
+					//Instead, it just makes things easier.
+					BannerActions::$editTextID = JRequest::getInt('text_id');
+					
+					//Same as a standard SpanBanner test
+					BannerActions::validateBannerSpanText();
+					
+					return EDIT_BANNER;
+				}
+				elseif (JRequest::getCmd('action') == 'single_text')
 				{
 					BannerActions::validateBannerText();
 					
 					$phpDate = mktime(0, 0, 0, JRequest::getInt('m'), JRequest::getInt('d'), JRequest::getInt('y'));
-					$mysqlDate = date( 'Y-m-d', $phpDate );
+					//$mysqlDate = date( 'Y-m-d', $phpDate );
 			
-					$textID = BannerDatabase::getIdByDate($banner->id, $mysqlDate);
+					$textID = BannerDatabase::getIdByDate($banner->id, $phpDate);
 			
 					//For security (and efficiency), use this rather than JRequest
 					BannerActions::$editTextID = $textID;
 					
 					//Set the text of the date - for visible purposes only
 					$date_text = $banner->date_text . " " . strftime($banner->date_format, $phpDate);
+					JRequest::setVar('date_text', $date_text);
+			
+					return EDIT_BANNER;
+				}
+				elseif (JRequest::getCmd('action') == 'span_text')
+				{
+					//BannerActions::validateBannerText(); //No validation needed!
+					BannerActions::validateBannerSpanText();
+					
+					//$phpDate = mktime(0, 0, 0, JRequest::getInt('m'), JRequest::getInt('d'), JRequest::getInt('y'));
+					//$mysqlDate = date( 'Y-m-d', $phpDate );
+			
+					//$textID = BannerDatabase::getIdByDate($banner->id, $mysqlDate);
+			
+					//Originally for security, but with span banners,
+					//there are no open holes that this fixes. 
+					//Instead, it just makes things easier.
+					BannerActions::$editTextID = JRequest::getInt('text_id');
+					
+					//Set the text of the date - for visible purposes only
+					$date_text = $banner->date_text . " " . strftime($banner->date_format); //NOW by default
 					JRequest::setVar('date_text', $date_text);
 			
 					return EDIT_BANNER;
@@ -106,11 +152,24 @@ class BannerActions
 
 				switch (JRequest::getCmd('action'))
 				{				
+					case 'summary' :
+						return BannerActions::viewBannerSummary($banner);
+						break;	
+								
 					case 'settings' :
 						return BannerActions::editBannerSettings($banner);
 						break;
-					case 'text' :
-						return BannerActions::editBannerText($banner);
+					case 'single_text' :
+						return BannerActions::editBannerSingleText($banner);
+						break;
+					case 'span_text' :
+						return BannerActions::editBannerSpanText($banner);
+						break;
+						
+					case 'add_text' :
+						//Add new banner text
+						//Only addable in span!!
+						return BannerActions::addBannerText($banner);
 						break;
 
 					default :
@@ -141,7 +200,58 @@ class BannerActions
 		//else
 		return false;
 	}
+
+	// ---------------- ADDING ----------------------
+	public static function addBannerText($banner)
+	{
+		JRequest::setVar('id', $banner->id);
+		
+		//Originally for security, but with span banners,
+		//there are no open holes that this fixes. 
+		//Instead, it just makes things easier.
+		//I had to do a little workaround here since there is no "text_id"
+		//for this new text YET. We haven't even created it!!
+		BannerActions::$editTextID = -1;
+		
+		//Default to today
+		JRequest::setVar('banner_start_date', strftime(DATEFORMAT_INPUT));
+		JRequest::setVar('banner_end_date',   strftime(DATEFORMAT_INPUT));
+		
+		return EDIT_BANNER;
+	}
 	
+	public static function saveAddBannerText($banner)
+	{
+		//Mainly check the dates
+		BannerActions::validateBannerSpanText();
+		if (BannerActions::hasErrors())
+		{
+			BannerActions::$editTextID = JRequest::getInt('text_id');
+			return EDIT_BANNER;
+		}
+		
+		//$start_date_arr = strptime(DATEFORMAT_INPUT, JRequest::getString('banner_start_date'));
+		//$sdate = mktime(0, 0, 0, $start_date_arr->month, $start_date_arr->day, $start_date_arr->year);
+		$sdate = strtotime(JRequest::getString('banner_start_date'));
+		$edate = 0; //"Blank" by default
+		
+		//The end date is optional!
+		//But will be checked if it is not empty
+		if (strlen(JRequest::getString('banner_end_date')))
+		{
+			//$end_date_arr = strptime(DATEFORMAT_INPUT, JRequest::getString('banner_end_date'));
+			//$edate = mktime(0, 0, 0, $end_date_arr->month, $end_date_arr->day, $end_date_arr->year);
+			$edate = strtotime(JRequest::getString('banner_end_date'));
+		}
+		
+		//else
+		BannerDatabase::addBannerText($banner->id, JRequest::getString('main_text'), JRequest::getString('sub_text'), $sdate, $edate);
+		
+		//This is to make it easier for the banner to show up nicely!
+		//$date_text = $banner->date_text . " " . strftime($banner->date_format, $sdate); 
+		
+		return EDIT_BANNER;
+	}
 		
 	// ---------------- EDITING ----------------------
 	//If they have come this far, they are already validated and allowed to edit the banner
@@ -169,6 +279,19 @@ class BannerActions
 		return EDIT_BANNER_SETTINGS;
 	}
 	
+	public static function editBannerSingleText($banner)
+	{
+		//Actually, just use the single "editBannerText" function
+		//It handles both cases! :)
+		return BannerActions::editBannerText($banner);
+	}
+
+	public static function editBannerSpanText($banner)
+	{
+		//Actually, just use the single "editBannerText" function
+		//It handles both cases! :)
+		return BannerActions::editBannerText($banner);
+	}
 	
 	public static function editBannerText($banner)//, $day, $month, $year)
 	{
@@ -178,15 +301,18 @@ class BannerActions
 		{
 			//If not passed in manually,
 			//Calculate the ID based on date values
-					
+			
+			//This is mainly used for SINGLE and also used to create new banner text
+			
 			$day = JRequest::getInt('d');
 			$month = JRequest::getInt('m');
 			$year = JRequest::getInt('y');
 			
 			$phpDate = mktime(0, 0, 0, $month, $day, $year);
-			$mysqlDate = date( 'Y-m-d', $phpDate );
+			//$mysqlDate = date( 'Y-m-d', $phpDate );
 			
-			$textID = BannerDatabase::getIdByDate($banner->id, $mysqlDate);
+			//Will create a new id with that date if not already existing
+			$textID = BannerDatabase::getIdByDate($banner->id, $phpDate);
 		}
 
 		
@@ -205,9 +331,20 @@ class BannerActions
 			JRequest::setVar('sub_text', $text->sub_text);
 			JRequest::setVar('text_id', $textID); //Yes, duplicate, but this is okay
 			
-			//Used for the preview
+			
+			//Set both SINGLE and SPAN values, doesn't matter
+			
+			//Used for the SINGLE preview 
 			$date_text = $banner->date_text . " " . strftime($banner->date_format, $phpDate);
 			JRequest::setVar('date_text', $date_text);
+			
+			//Convert int dates to strings
+			$start_date = strftime(DATEFORMAT_INPUT, $text->banner_start_date);
+			$end_date =   strftime(DATEFORMAT_INPUT, $text->banner_end_date);
+			
+			//Used for SPAN
+			JRequest::setVar('banner_start_date', $start_date);
+			JRequest::setVar('banner_end_date', $end_date);
 			
 			//Setting the "editTextID" property will automatically make the extra form appear
 			return EDIT_BANNER;
@@ -234,7 +371,29 @@ class BannerActions
 	public static function validateBannerText()
 	{
 		//Requires no validation
-		return;
+		//return;
+	}
+	
+	public static function validateBannerSpanText()
+	{
+		//$start_date_arr = strptime(DATEFORMAT_INPUT, JRequest::getString('banner_start_date'));
+		//if ($start_date_arr->error_count)
+		if (!strtotime(JRequest::getString('banner_start_date')))
+		{
+			BannerActions::addError('banner_start_date', E_BAD_DATEFORMAT);
+		}
+		
+		//The end date is optional!
+		//But will be checked if it is not empty
+		if (strlen(JRequest::getString('banner_end_date')))
+		{
+			//$end_date_arr = strptime(DATEFORMAT_INPUT, JRequest::getString('banner_end_date'));
+			//if ($end_date_arr->error_count)
+			if (!strtotime(JRequest::getString('banner_end_date')))
+			{
+				BannerActions::addError('banner_end_date', E_BAD_DATEFORMAT);
+			}
+		}
 	}
 	
 	
@@ -257,22 +416,22 @@ class BannerActions
 			 JRequest::getString('price_text'),
 			 JRequest::getString('time_text'));
 			 
-   		return EDIT_BANNER;
+		return EDIT_BANNER;
 	}
 	
-	public static function saveBannerText($banner)
+	public static function saveBannerSingleText($banner)
 	{
 		/*
 		BannerActions::validateBannerText();
 		if (BannerActions::hasErrors())
 		{
+			BannerActions::$editTextID = JRequest::getInt('text_id');
 			return EDIT_BANNER;
 		}
 		*/
 		//else continue
 		
 		//The database will automatically clean the strings.
-		
 		BannerDatabase::setBannerTextByID(JRequest::getInt('text_id'), $banner->id, JRequest::getString('main_text'), JRequest::getString('sub_text'));
 		
 		$date_text = $banner->date_text . " " . strftime($banner->date_format, mktime(0, 0, 0, JRequest::getInt('m'), JRequest::getInt('d'), JRequest::getInt('y')));
@@ -280,7 +439,42 @@ class BannerActions
 		//Now make the preview thingy look nice
 		JRequest::setVar('date_text', $date_text);
 		
-   		return EDIT_BANNER;
+		return EDIT_BANNER;
+	}
+	
+	public static function saveBannerSpanText($banner)
+	{
+		BannerActions::validateBannerSpanText();
+		if (BannerActions::hasErrors())
+		{
+			BannerActions::$editTextID = JRequest::getInt('text_id');
+			return EDIT_BANNER;
+		}
+		
+		//else continue
+		
+		//$start_date_arr = strptime(DATEFORMAT_INPUT, JRequest::getString('banner_start_date'));
+		//$sdate = mktime(0, 0, 0, $start_date_arr->month, $start_date_arr->day, $start_date_arr->year);
+		$sdate = strtotime(JRequest::getString('banner_start_date'));
+		$edate = 0; //"Blank" by default
+		
+		//The end date is optional!
+		//But will be checked if it is not empty
+		if (strlen(JRequest::getString('banner_end_date')))
+		{
+			//$end_date_arr = strptime(DATEFORMAT_INPUT, JRequest::getString('banner_end_date'));
+			//$edate = mktime(0, 0, 0, $end_date_arr->month, $end_date_arr->day, $end_date_arr->year);
+			$edate = strtotime(JRequest::getString('banner_end_date'));
+		}
+		
+		//The database will automatically clean the strings.
+		BannerDatabase::setBannerTextByID(JRequest::getInt('text_id'), $banner->id, JRequest::getString('main_text'), JRequest::getString('sub_text'), $sdate, $edate);
+		
+		//This is to make it easier for the preview of the banner to show up nicely!
+		$date_text = $banner->date_text . " " . strftime($banner->date_format, $sdate); 
+		JRequest::setVar('date_text', $date_text);
+		
+		return EDIT_BANNER;
 	}
 	
 	
@@ -290,9 +484,22 @@ class BannerActions
 	//It is difficult keeping track of it in the database otherwise.
 	//Maybe it's better to use the date and bannerID as the unique identifiers?
 	private static $editTextID = 0;
-	public static function showEditBannerText()
+	public static function editingText()
 	{
-		if (BannerActions::$editTextID)
+		return (BannerActions::$editTextID) ? true : false;
+	}
+	
+	
+	public static function viewBannerSummary($baner)
+	{
+		//No checks needed!
+		return BANNER_SUMMARY;
+	}
+	
+	
+	public static function showEditBannerText($categoryType = CTYPE_SPAN)
+	{
+		if (BannerActions::editingText())
 		{
 			/*
 			//Convert the date to a from that is openable by MySQL
@@ -300,7 +507,21 @@ class BannerActions
 			$mysqlDate = date( 'Y-m-d', $phpdate );
 			$text_id = BannerDatabase::getIdByDate();
 			*/
-			include(EDIT_BANNER_TEXT);
+			//include(EDIT_BANNER_TEXT);
+			
+			if ($categoryType == CTYPE_SINGLE)
+			{
+				require(EDIT_BANNER_TEXT_SINGLE); 
+			}
+			elseif ($categoryType == CTYPE_SPAN)
+			{ 
+				require(EDIT_BANNER_TEXT_SPAN); 
+			}
+			else
+			{
+				//By default, list used banners
+				require(EDIT_BANNER_TEXT_SPAN); 
+			}
 		}
 	}
 	
@@ -317,12 +538,14 @@ class BannerActions
 			$currentYear = intval(date('Y'));
 			if (($currentMonth != $month) || ($currentYear != $year))
 			{
-				//Current month
+				//Current month - if not already the current month
 				echo '<span class="elbanner_month">'.BannerActions::monthText($baseURL, $currentMonth, $currentYear).' &nbsp; </span>';
 			}
 		
-			//Current month
-			echo '<span class="elbanner_current_month">'.BannerActions::monthText($baseURL, $month, $year).' &nbsp; </span>';
+			//Displayed month
+			//EDIT: Not URLS
+			//echo '<span class="elbanner_current_month">'.BannerActions::monthText($baseURL, $month, $year).' &nbsp; </span>';
+			echo '<span class="elbanner_current_month"><b>'.strftime(DATEFORMAT_MONTH_TEXT, mktime(0,0,0, $month, 1, $year)).' &nbsp; </b></span>';
 			
 			//Next two months
 			echo '<span class="elbanner_month">'.BannerActions::monthText($baseURL, $month+1, $year).' &nbsp; </span>';
@@ -350,11 +573,19 @@ class BannerActions
 		
 		if ($editable)
 		{
-			$baseURL .= "&m=".$month . "&y=".$year . "&action=text";
+			if ($year < $currentYear)
+				{ $editable = false; }
+			elseif (($year == $currentYear) && ($month < $currentMonth))
+				{ $editable = false; }
+		}
+		
+		if ($editable)
+		{
+			$baseURL .= "&m=".$month . "&y=".$year . "&action=single_text";
 		}
 		
 		//The number of days in the specified month
-   		$numDays = date("t", mktime(0,0,0, $month, 1, $year));
+		$numDays = date("t", mktime(0,0,0, $month, 1, $year));
 		$mainTextArray = array();
 		$subTextArray = array();
 		
@@ -418,6 +649,7 @@ class BannerActions
 	}
 
 	
+	// "AllBannerText" is same as "span text"
 	public static function showAllBannerTextTable($bannerID, $baseURL = "")
 	{
 		$editable = ($baseURL) ? true : false;
@@ -469,7 +701,7 @@ class BannerActions
 					}
 					else
 					{ 
-						echo '<td valign="top"><a href="'.$baseURL."&action=text&text_id=".$bannerText->id.'"><img src="'.EDIT_IMAGE.'" /></a></td>'; 
+						echo '<td valign="top"><a href="'.$baseURL."&action=span_text&text_id=".$bannerText->id.'"><img src="'.EDIT_IMAGE.'" /></a></td>'; 
 					}
 				}
 				
@@ -497,12 +729,92 @@ class BannerActions
 	}
 	
 	
+	
+	public static function showBannerSummaryTable_single($bannerID, $baseURL = "")
+	{
+		
+		$bannerSummaryArray = BannerDatabase::getBannerCountsByMonth($bannerID);
+		
+		$i = 0;
+		echo '<table>';
+		
+		//Create the header
+		echo '<tr>';
+		echo '<th>'.HEADER_MONTH.'</th>';
+		echo '<th>'.HEADER_MONTH_COUNT.'</th>';
+		echo '</tr>';
+		
+		foreach($bannerSummaryArray as $banner)
+		{
+			$class = ($i++ % 2) ? "odd" : "even";
+
+			echo '<tr class="'.$class.'">';
+							
+			echo '<td>'.BannerActions::monthText($baseURL, $banner->month, $banner->year).'</td>';	
+			echo '<td>'.intval($banner->count).'</td>';
+			
+			echo '</tr>';
+		}
+		echo '</table>';
+	}
+	
+	public static function showBannerSummaryTable_span($bannerID, $baseURL = "")
+	{
+		
+		$bannerSummaryArray = BannerDatabase::getBannerCountsByBanner($bannerID);
+		
+		$i = 0;
+		echo '<table>';
+	
+		//Create the header
+		echo '<tr>';
+		//echo '<th></th>'; //The first column houses the edit button, and is therefore blank
+		echo '<th>'.HEADER_BEGIN_DATE.'</th>';
+		echo '<th>'.HEADER_END_DATE.'</th>';
+		echo '<th>'.HEADER_MAIN_TEXT.'</th>';
+		echo '<th>'.HEADER_DAYS_COUNT.'</th>';
+		echo '</tr>';
+		
+		foreach($bannerSummaryArray as $banner)
+		{
+			$class = ($i++ % 2) ? "odd" : "even";
+
+			echo '<tr class="'.$class.'">';
+							
+			//echo '<td>'.BannerActions::monthText($baseURL, $bannerSummaryArray['month'], $bannerSummaryArray['year']).'</td>';	
+			
+			$start_date = 	strftime(DATEFORMAT_TEXT_LIST, $banner->banner_start_date);
+			$end_date = 	strftime(DATEFORMAT_TEXT_LIST, $banner->banner_end_date);
+			echo '<td valign="top">'.Banner::makeHTML($start_date).'</td>';	
+			echo '<td valign="top">'.Banner::makeHTML($end_date).'</td>';
+			
+			//Only display the first 50 characters of the text
+			$main_text = $banner->main_text;
+			if (strlen($maintext) > 50) 
+				{ $main_text = substr($main_text, 0, 47) . "..."; }
+			
+			echo '<td valign="top">'.Banner::makeHTML($main_text).'</td>';
+			
+			//Number of days the banner was displayed
+			echo '<td>'.intval($banner->num_days).'</td>';
+			
+			echo '</tr>';
+		}
+		echo '</table>';
+	}
+	
+	
 	// ---------------- MISC ----------------------
 	public static function getBannerCategoryType($banner_id)
 	{
 		
-		$categoryID = BannerDatabase::getBannerCategory($banner_id);
-		
+		$category_id = BannerDatabase::getBannerCategory($banner_id);
+		return BannerActions::getCTypeByCategoryID($category_id);
+
+	}
+	
+	public static function getCTypeByCategoryID($categoryID)
+	{
 		switch ($categoryID)
 		{
 			case CAT_LUNCHGUIDEN:
@@ -515,8 +827,6 @@ class BannerActions
 				return CTYPE_SPAN;
 		}
 	}
-	
-	
 	
 
 }

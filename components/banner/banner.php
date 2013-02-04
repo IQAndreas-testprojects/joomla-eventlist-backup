@@ -11,8 +11,8 @@ class Banner
 	public static function displayAdminLink()
 	{
 		echo '<a href="http://stadsaktuellt.nu/index.php?option=com_eventlist&task=banner_admin">';
-		echo '<img src="'.EDIT_IMAGE.'" />'.ADD_REMOVE_BANNERS;
-		echo '</a>';
+		echo '<img src="'.EDIT_IMAGE.'" />'.'&nbsp;'.ADD_REMOVE_BANNERS;
+		echo '</a><br/>';
 	}
 	
 	
@@ -58,15 +58,17 @@ class Banner
 				if ($banner->category == CAT_LUNCHGUIDEN)
 					{ $lhead_text = SAMPLE_LHEAD_TEXT; }
 				
-				Banner::showBanner($text->main_text, $text->sub_text, $banner->price_text, $banner->time_text, $date_text, $lhead_text, $banner->site_url, $banner->background_image, $banner->name);
-
+				$adminLink = "";
 				//Show edit button if current owner or administrator
 				if ($admin || ($user->id == $banner->owner))
 				{
-					echo '<a href="http://stadsaktuellt.nu/index.php?option=com_eventlist&task=edit_banner&id='.$banner->id.'">';
-					echo '<img src="'.EDIT_IMAGE.'" />';
-					echo '</a>';
+					$adminLink .= '<a href="http://stadsaktuellt.nu/index.php?option=com_eventlist&task=edit_banner&id='.$banner->id.'">';
+					$adminLink .= '&nbsp;<img src="'.EDIT_IMAGE.'" /></a>';
 				}
+				
+				Banner::showBanner($text->main_text, $text->sub_text, $banner->price_text, $banner->time_text, $date_text, $lhead_text, $banner->site_url, $banner->background_image, $banner->name, $adminLink);
+
+
 			}
 			else
 			{
@@ -77,7 +79,7 @@ class Banner
 					echo '<a href="http://stadsaktuellt.nu/index.php?option=com_eventlist&task=edit_banner&id='.$banner->id.'">';
 					echo '<img src="'.EDIT_IMAGE.'" />';
 					echo '&nbsp;' . Banner::makeHTML($banner->name) . '&nbsp; - &nbsp;' . NO_BANNER_TEXT_TODAY;
-					echo '</a>';
+					echo '</a> <br/>';
 				}
 			}
 		}
@@ -117,8 +119,7 @@ class Banner
 			if ($banner->category == CAT_LUNCHGUIDEN)
 				{ $lhead_text = SAMPLE_LHEAD_TEXT; }
 			
-	   		Banner::displayCustomBanner($main_text, $sub_text, $banner->price_text, $banner->time_text, $date_text, $lhead_text, $banner->site_url, $banner->background_image, $banner->name);
-		}
+	   		Banner::displayCustomBanner($main_text, $sub_text, $banner->price_text, $banner->time_text, $date_text, $lhead_text, $banner->site_url, $banner->background_image, $banner->name);		}
 	}
 	
 	
@@ -135,10 +136,13 @@ class Banner
 
 	
 	//Displays the RAW banner, with no div or edit buttons
-	static function showBanner($main_text, $sub_text, $price_text, $time_text, $date_text, $lhead_text, $site_url, $background_image, $image_alt = "")
+	static function showBanner($main_text, $sub_text, $price_text, $time_text, $date_text, $lhead_text, $site_url, $background_image, $image_alt = "", $adminLink = "")
 	{
+		//If needed, include the adminLink, however, do not parse it for HTML tags!!
+		
 		//Now, make it into a giant link!!
 		echo '<a target="_blank" href="'.$site_url.'">';
+		echo '<span class="dagens_banner_link" style="display:block;">';
 		
 		echo '<table class="dagens" cellpadding="0" cellspacing="0">';
 		echo '<tr class="head">';
@@ -151,7 +155,7 @@ class Banner
 			echo '<td class="spacer">&nbsp;</td>';
 			echo '<td><img src="'.BANNER_IMAGE_ROOT_URL.$background_image.'" alt="'.Banner::makeHTML($image_alt).'" class="dagens" /></td>';
 			echo '<td>';
-				echo '<h1 class="dagens">'.Banner::makeHTML($main_text).'</h1>';
+				echo '<h1 class="dagens">'.Banner::makeHTML($main_text).$adminLink.'</h1>';
 				echo '<h6 class="dagens">'.Banner::makeHTML($sub_text).'</h2>';
 			echo '</td>';
 			echo '<td class="spacer">&nbsp;</td>';
@@ -164,6 +168,7 @@ class Banner
 		echo '</tr>';
 		echo '</table>';
 		
+		echo '</span>';
 		echo '</a>';
 	}
 	

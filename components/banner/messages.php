@@ -34,6 +34,9 @@ define('DATEFORMAT_MONTH_TEXT', "%B %Y");
 //define('DATEFORMAT_TIME_TEXT', "DAGENS LUNCH %A %e %B");
 define('DATEFORMAT_ENTER_DAILY_TEXT', "%A %e %B");
 define('DATEFORMAT_TEXT_LIST', "%a %e %b");
+// http://se2.php.net/manual/en/function.date.php
+//define('DATEFORMAT_INPUT',	"Y-n-j");
+define('DATEFORMAT_INPUT',	"%Y-%m-%d");
 
 //BANNER EDITING
 define('EDIT_BANNER_DESIGN', 	"Ändra annonsens utseende");
@@ -41,8 +44,10 @@ define('SAVE_BANNER_DESIGN', 	"Spara");
 define('PREVIEW_BANNER_DESIGN',	"Förhandsgranska ändringarna");
 
 define('ENTER_DAILY_TEXT_FOR',	"Välj text för");
+define('EDIT_BANNER_TEXT',		"Ändra banner text");
 define('SAVE_BANNER_TEXT',		"Spara");
 define('PREVIEW_BANNER_TEXT',	"Förhandsgranska");
+define('DATE_FORMAT_TEXT',		"Datum ska srivas som 2010-12-31 (YYYY-MM-DD)");
 
 
 //HEADERS
@@ -51,6 +56,10 @@ define('HEADER_END_DATE', 	"Slut datum");
 define('HEADER_MAIN_TEXT', 	""); //Are these better blank?
 define('HEADER_SUB_TEXT', 	""); //Are these better blank?
 
+define('HEADER_MONTH', "Månad");
+define('HEADER_MONTH_COUNT', "Antal banners");
+define('HEADER_DAYS_COUNT', "Antal dagar");
+
 
 //LABELS - USER INTERFACE
 define('LABEL_SITE_URL', 		"Hemsida: ");
@@ -58,6 +67,8 @@ define('LABEL_BACKGROUND_IMAGE',"Bakgrundsbild: ");
 define('LABEL_DATE_TEXT', 		"Huvud text: ");
 define('LABEL_PRICE_TEXT', 		"Pris: ");
 define('LABEL_TIME_TEXT', 		"Serveringstid: ");
+define('LABEL_START_DATE',		"Start datum: ");
+define('LABEL_END_DATE',		"Slut datum: ");
 
 
 // CATEGORY - DEFAULT
@@ -97,6 +108,8 @@ define('EDIT_REMOVE_BANNER',"Ändra/Ta bort");
 define('REMOVE_BANNER', 	"Ta bort");
 define('REMOVE_BANNER_PERMANENTLY', "Ta bort bannern permanent. Kan ej återställas!");
 
+define('ADD_BANNER_TEXT', 	"Lägg till annonstext");
+
 
 //ERROR MESSAGES
 define('NO_BANNER_TEXT_TODAY', 	'Ingen annonstext för idag - ändra');
@@ -107,7 +120,7 @@ define('NO_SUB_TEXT', 			'&nbsp;&nbsp;&nbsp;');
 define('E_URL_TOO_SHORT', 		'Hemsidesaddress för kort');
 define('E_NO_BACKGROUND_IMAGE', 'Ingen bakgrundsbild');
 define('E_NOT_ADMIN', 			'Insufficient privelages. Only administrators are allowed to edit banners.');
-
+define('E_BAD_DATEFORMAT', 		"Fel med datum texten");
 
 
 ?>

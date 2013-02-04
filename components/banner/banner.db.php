@@ -177,6 +177,7 @@ class BannerDatabase
 		$query .= "WHERE (banner_id='".intval($bannerID)."') ";
 		$query .= "AND (enabled = '1') ";
 		$query .= "AND (banner_start_date = CURDATE()) ";
+		$query .= "AND (CHAR_LENGTH(`main_text`) + CHAR_LENGTH(`main_text`) > 4) "; //Skips blank banners
 		$query .= "LIMIT 1; ";
 
 		$db->setQuery($query);
@@ -196,6 +197,7 @@ class BannerDatabase
 		$query .= "AND (enabled = '1') ";
 		$query .= "AND (banner_start_date <= CURDATE()) ";
 		$query .= "AND (IF(banner_end_date IS NULL, banner_start_date, banner_end_date) >= CURDATE()) ";
+		$query .= "AND (CHAR_LENGTH(`main_text`) + CHAR_LENGTH(`main_text`) > 4) "; //Skips blank banners
 		$query .= "LIMIT 1; ";
 
 		$db->setQuery($query);
@@ -214,17 +216,59 @@ class BannerDatabase
 		$query .= "FROM `#__eventlist_banner_values` ";
 		$query .= "WHERE (banner_id='".intval($bannerID)."') ";
 		$query .= "AND (enabled = '1') ";
+		$query .= "AND (CHAR_LENGTH(`main_text`) + CHAR_LENGTH(`main_text`) > 4) "; //Skips blank banners
 		$query .= "AND (MONTH(banner_start_date) = '".intval($month)."') ";
 		$query .= "AND (YEAR(banner_start_date) = '".intval($year)."'); ";
-				
+		
 		$db->setQuery($query);
 		return $db->loadObjectList();  
 	}
 	
+	//Returns all months and years, and the number of banners in that time period
+	public static function getBannerCountsByMonth($bannerID)
+	{
+		$db =& JFactory::getDBO();
+
+		$query = "SELECT COUNT(*) as `count`, YEAR(`banner_start_date`) AS `year`, MONTH(`banner_start_date`) AS `month` ";
+		$query .= "FROM `#__eventlist_banner_values` ";
+		$query .= "WHERE (banner_id='".intval($bannerID)."') ";
+		$query .= "AND (enabled = '1') ";
+		$query .= "AND (CHAR_LENGTH(`main_text`) + CHAR_LENGTH(`main_text`) > 4) "; //Skips blank banners
+		$query .= "GROUP BY YEAR(`banner_start_date`), MONTH(`banner_start_date`) ";
+		$query .= "ORDER BY YEAR(`banner_start_date`), MONTH(`banner_start_date`); ";
+		
+		$db->setQuery($query);
+		return $db->loadObjectList();
+		//echo ($db->getErrorMsg());
+		//return $return;
+	}
+	
+	//Returns all months and years, and the number of banners in that time period
+	public static function getBannerCountsByBanner($bannerID)
+	{
+		$db =& JFactory::getDBO();
+
+		//REMEBER! +1 to the day because DATE_DIFF() does not include the day it was first displayed etc
+		
+		$query = "SELECT `id`, (DATEDIFF(IF(`banner_end_date` IS NULL, `banner_start_date`, `banner_end_date`), `banner_start_date`) + 1) AS `num_days`, ";
+		$query .= "UNIX_TIMESTAMP(`banner_start_date`) as `banner_start_date`, UNIX_TIMESTAMP(IF(banner_end_date IS NULL, banner_start_date, banner_end_date)) AS `banner_end_date`, `main_text`, `sub_text` ";
+		$query .= "FROM `#__eventlist_banner_values` ";
+		$query .= "WHERE (banner_id='".intval($bannerID)."') ";
+		$query .= "AND (enabled = '1') ";
+		$query .= "AND (CHAR_LENGTH(`main_text`) + CHAR_LENGTH(`main_text`) > 4) "; //Skips blank banners
+		$query .= "ORDER BY `banner_start_date`; ";
+		
+		$db->setQuery($query);
+		return $db->loadObjectList();  
+	}
+	
+	
+	//IF(banner_end_date IS NULL, banner_start_date, banner_end_date)
+	
 	//NOTICE!!! WEEK!!!
 	//http://dev.mysql.com/doc/refman/5.1/en/date-and-time-functions.html#function_week
 	//Experiment with!!
-	public static function getBannerTextByWeek($bannerID, $week, $year)
+	/*public static function getBannerTextByWeek($bannerID, $week, $year)
 	{
 		$db =& JFactory::getDBO();
 
@@ -237,7 +281,7 @@ class BannerDatabase
 				
 		$db->setQuery($query);
 		return $db->loadObjectList();  
-	}
+	}*/
 	
 	public static function getSpanBannerAllText($bannerID)
 	{
@@ -247,15 +291,17 @@ class BannerDatabase
 		//$query = "SELECT `id`, UNIX_TIMESTAMP(`banner_start_date`) as `banner_start_date`, UNIX_TIMESTAMP(`banner_end_date`) as `banner_end_date`, `main_text`, `sub_text`, "; //GET_FORMAT(banner_start_date,'ISO') AS date_text, 
 		$query = "SELECT `id`, UNIX_TIMESTAMP(`banner_start_date`) as `banner_start_date`, UNIX_TIMESTAMP(IF(banner_end_date IS NULL, banner_start_date, banner_end_date)) as `banner_end_date`, `main_text`, `sub_text`, "; //GET_FORMAT(banner_start_date,'ISO') AS date_text, 
 		
-		$query .= "   IF(CURDATE() > banner_end_date, 1, 0) AS `old`, IF(CURDATE() >= banner_start_date, 1, 0) AS `running` ";
+		$query .= "   IF(CURDATE() > IF(banner_end_date IS NULL, banner_start_date, banner_end_date), 1, 0) AS `old`, IF(CURDATE() >= banner_start_date, 1, 0) AS `running` ";
 		$query .= "FROM `#__eventlist_banner_values` ";
 		$query .= "WHERE (banner_id='".intval($bannerID)."') ";
-		$query .= "AND (enabled = '1'); ";
+		$query .= "AND (enabled = '1') ";
+		$query .= "AND (CHAR_LENGTH(`main_text`) + CHAR_LENGTH(`main_text`) > 4) "; //Skips blank banners
+		$query .= "ORDER BY `banner_start_date` DESC; ";
 				
 		$db->setQuery($query);
-		$return = $db->loadObjectList();  
-		echo $db->getErrorMsg();
-		return $return;
+		return $db->loadObjectList();  
+		//echo $db->getErrorMsg();
+		//return $return;
 	}
 		
 	
@@ -273,7 +319,7 @@ class BannerDatabase
 		}
 		//else
 		
-		BannerDatabase::addBannerText($bannerID, $date, "", "");
+		BannerDatabase::addBannerText($bannerID, "", "", $date); //No end date set!
 		
 		//I'm not sure of a quick way to get the id from a newly created
 		//banner, so this will do...
@@ -286,7 +332,7 @@ class BannerDatabase
 
 		$query = "SELECT `id` FROM `#__eventlist_banner_values` ";
 		$query .= "WHERE (banner_id='".intval($bannerID)."') ";
-		$query .= "AND (banner_start_date = '".clean($date)."') ";
+		$query .= "AND (banner_start_date = FROM_UNIXTIME(".intval($date).")) ";
 		$query .= "LIMIT 1; ";
 
 		$db->setQuery($query);
@@ -301,13 +347,29 @@ class BannerDatabase
 	}
 	
 	
-	private static function addBannerText($banner_id, $banner_start_date, $main_text, $sub_text)
+	public static function addBannerText($banner_id, $main_text, $sub_text, $banner_start_date = -1, $banner_end_date = 0)
 	{
 		$db =& JFactory::getDBO();
+		
+		if ($banner_start_date == -1)
+			{ $banner_start_date = time(); } //Default to now
+			
+		$cleaned_start_date = "FROM_UNIXTIME(".intval($banner_start_date).")";
+		
+		$cleaned_end_date = "";
+		if ($banner_end_date)
+		{
+			$cleaned_end_date = "FROM_UNIXTIME(".intval($banner_end_date).")";
+		}
+		else
+		{
+			//Set the start and end dates to equal if no other value is set for the end
+			$cleaned_end_date = $cleaned_start_date;
+		}
 
 		$query = "INSERT INTO `#__eventlist_banner_values` ";
-		$query .= "(`banner_id`, `banner_start_date`, `main_text`, `sub_text`) ";
-		$query .= "VALUES ('".intval($banner_id)."', '".clean($banner_start_date)."', '".clean($main_text)."', '".clean($sub_text)."'); ";
+		$query .= "(`banner_id`, `banner_start_date`, `banner_end_date`, `main_text`, `sub_text`) ";
+		$query .= "VALUES ('".intval($banner_id)."', ".$cleaned_start_date.", ".$cleaned_end_date.", '".clean($main_text)."', '".clean($sub_text)."'); ";
 
 		$db->setQuery($query);
 		$db->query();
@@ -319,7 +381,7 @@ class BannerDatabase
 	{
 		$db =& JFactory::getDBO();
 
-		$query = "SELECT `main_text`, `sub_text` ";
+		$query = "SELECT `id`, `main_text`, `sub_text`, UNIX_TIMESTAMP(`banner_start_date`) as `banner_start_date`, UNIX_TIMESTAMP(IF(banner_end_date IS NULL, banner_start_date, banner_end_date)) as `banner_end_date` ";
 		$query .= "FROM `#__eventlist_banner_values` ";
 		$query .= "WHERE (id='".intval($id)."') ";
 		//$query .= "AND (banner_start_date = '".clean($banner_start_date)."') ";
@@ -331,12 +393,50 @@ class BannerDatabase
 	
 	//NOTE: 'id' is NOT the same as 'banner_id'
 	//The extra "banner_id" parameter is there for added security
-	public static function setBannerTextByID($id, $banner_id, $main_text, $sub_text)
+	public static function setBannerTextByID($id, $banner_id, $main_text, $sub_text, $banner_start_date = -1, $banner_end_date = -1)
 	{
 		$db =& JFactory::getDBO();
 
 		$query = "UPDATE `#__eventlist_banner_values` ";
 		$query .= "SET `main_text` = '".clean($main_text)."', `sub_text` = '".clean($sub_text)."' ";
+		$query .= "WHERE (id='".intval($id)."') ";
+		$query .= "AND (banner_id='".intval($banner_id)."') ";
+		$query .= "LIMIT 1; ";
+
+		$db->setQuery($query);
+		$db->query();
+		
+		if ($banner_start_date != -1)
+		{
+			BannerDatabase::setBannerTextDate($id, $banner_id, $banner_start_date, $banner_end_date);
+		}
+	}
+	
+	//NOTE: 'id' is NOT the same as 'banner_id'
+	//The extra "banner_id" parameter is there for added security
+	public static function setBannerTextDate($id, $banner_id, $banner_start_date = -1, $banner_end_date = -1)
+	{
+		$db =& JFactory::getDBO();
+		
+		if ($banner_start_date == -1)
+			{ $banner_start_date = time(); } //Default to now
+			
+		$cleaned_start_date = "FROM_UNIXTIME(".intval($banner_start_date).")";
+		
+		$cleaned_end_date = "";
+		if ($banner_end_date == -1)
+		{
+			//Set the start and end dates to equal if no other value is set for the end
+			//$cleaned_end_date = $cleaned_start_date;
+			$cleaned_end_date = "NULL";
+		}
+		else
+		{
+			$cleaned_end_date = "FROM_UNIXTIME(".intval($banner_end_date).")";
+		}
+
+		$query = "UPDATE `#__eventlist_banner_values` ";
+		$query .= "SET `banner_start_date` = ".$cleaned_start_date.", `banner_end_date` = ".$cleaned_end_date." ";
 		$query .= "WHERE (id='".intval($id)."') ";
 		$query .= "AND (banner_id='".intval($banner_id)."') ";
 		$query .= "LIMIT 1; ";

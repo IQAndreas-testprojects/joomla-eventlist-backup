@@ -273,7 +273,7 @@ class BannerAdmin
 	}*/
 
 	
-	public static function listAllBanners($baseURL = "")
+	public static function listAllBanners($adminURL = "", $summary_url = "")
 	{
 		
 		$bannersArray = BannerAdminDatabase::getBanners();
@@ -291,23 +291,25 @@ class BannerAdmin
 							
 			echo '<td>'.$i.".".'</td>';	
 			
-			echo '<td><a href="'.$baseURL."&edit=1&id=".$banner->id.'">'.EDIT_REMOVE_BANNER.'</a></td>';
-			echo '<td>'.htmlspecialchars($banner->name).'</td>';
+			echo '<td><a href="'.$adminURL."&edit=1&id=".$banner->id.'">'.EDIT_REMOVE_BANNER.'</a>&nbsp;</td>';
+			
+			//Now made into a clickable link which leads to the summary
+			echo '<td><a href="'. $summary_url."&id=".$banner->id .'">'.htmlspecialchars($banner->name).'</a></td>';
 			
 			if ($banner->enabled)
 			{
-				echo '<td><a href="'.$baseURL."&disable=1&id=".$banner->id.'">'.CLICK_TO_DISABLE.'</a></td>';
+				echo '<td>&nbsp;<a href="'.$adminURL."&disable=1&id=".$banner->id.'">'.CLICK_TO_DISABLE.'</a></td>';
 			}
 			else
 			{
-				echo '<td><a href="'.$baseURL."&enable=1&id=".$banner->id.'">'.CLICK_TO_ENABLE.'</a></td>';
+				echo '<td>&nbsp;<a href="'.$adminURL."&enable=1&id=".$banner->id.'">'.CLICK_TO_ENABLE.'</a></td>';
 			}
 			
 			echo '</tr>';
 		}
 		echo '</table>';
 	}
-
+	
 	
 	public static function showUsersDropdown($selectedUser = 0, $name = 'banner_owner')
 	{
