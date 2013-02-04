@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * @version 1.0 $Id: default.php 958 2009-02-02 17:23:05Z julienv $
  * @package Joomla
@@ -43,7 +43,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		<?php echo $this->escape($row->catname); ?>
 	</h2>
 
-	<!--div class="catimg">
+	<div class="catimg">
 	  	<?php
 			echo JHTML::_('link', JRoute::_($row->linktarget), $row->image);
 		?>
@@ -53,7 +53,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			echo JHTML::_('link', JRoute::_($row->linktarget), $row->assignedevents);
 			?>
 		</p>
-	</div-->
+	</div>
 
 	<div class="catdescription cat<?php echo $row->id; ?>"><?php echo $row->catdescription ; ?>
 	<p>

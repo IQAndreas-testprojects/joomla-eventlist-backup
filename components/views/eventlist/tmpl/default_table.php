@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * @version 1.0 $Id: default_table.php 958 2009-02-02 17:23:05Z julienv $
  * @package Joomla
@@ -128,15 +128,15 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
   			<tr class="sectiontableentry<?php echo ($row->odd +1 ) . $this->params->get( 'pageclass_sfx' ); ?>" >
 
     			<td headers="el_date" align="left">
-    				
+    				<strong>
     					<?php echo ELOutput::formatdate($row->dates, $row->times); ?>
     					
     					<?php
     					if ($row->enddates) :
-    						echo ' -'.ELOutput::formatdate($row->enddates, $row->endtimes);
+    						echo ' - '.ELOutput::formatdate($row->enddates, $row->endtimes);
     					endif;
     					?>
-    				
+    				</strong>
     				
 					<?php
 					if ($this->elsettings->showtime == 1) :
@@ -146,7 +146,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 						echo ELOutput::formattime($row->dates, $row->times);
 						
 						if ($row->endtimes) :
-							echo ' -'.ELOutput::formattime($row->enddates, $row->endtimes);
+							echo ' - '.ELOutput::formattime($row->enddates, $row->endtimes);
 						endif;
 					endif;
 					?>

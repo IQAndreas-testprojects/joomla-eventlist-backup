@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * @version 1.0 $Id: default.php 958 2009-02-02 17:23:05Z julienv $
  * @package Joomla
@@ -99,7 +99,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
   			alert("<?php echo JText::_( 'ERROR ADD CITY', true ); ?>");
   			form.city.focus();
   			return false;
-  		} else if ( validator.validate(form.country) === false) {
+		} else if ( validator.validate(form.country) === false) {
    			alert("<?php echo JText::_( 'ERROR ADD COUNTRY', true ); ?>");
    			form.country.focus();
    			return false;
@@ -199,16 +199,18 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
                 <label for="state"><?php echo JText::_( 'STATE' ).':'; ?></label>
                 <input class="inputbox" type="text" name="state" id="state" value="<?php echo $this->row->state; ?>" size="55" maxlength="50" />
             </div>
-			<div class="el_country floattext">
+
+            <div class="el_country floattext">
                 <label for="country"><?php echo JText::_( 'COUNTRY' ).':'; ?></label>
                 <input class="inputbox" type="text" name="country" id="country" value="<?php echo $this->row->country; ?>" size="3" maxlength="2" />
                 <span class="editlinktip hasTip" title="<?php echo JText::_( 'NOTES' ); ?>::<?php echo JText::_('COUNTRY HINT'); ?>">
                 		<?php echo $this->infoimage; ?>
                 </span>
             </div>
+
             <div class="el_url floattext">
                 <label for="url"><?php echo JText::_( 'WEBSITE' ).':'; ?></label>
-                <input class="inputbox" name="url" id="url" type="text" value="<?php echo $this->escape($this->row->url); ?>" size="50" maxlength="199" />&nbsp;
+                <input class="inputbox" name="url" id="url" type="text" value="<?php echo $this->escape($this->row->url); ?>" size="55" maxlength="199" />&nbsp;
                 <span class="editlinktip hasTip" title="<?php echo JText::_( 'NOTES' ); ?>::<?php echo JText::_('WEBSITE HINT'); ?>">
                 		<?php echo $this->infoimage; ?>
                 </span>
