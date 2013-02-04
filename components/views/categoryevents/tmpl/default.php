@@ -22,6 +22,39 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 ?>
+
+
+
+
+<?php //ANDREAS RENBERG 2010 
+        //Moved banner further up on the page. Good idea?
+        $user =& JFactory::getUser();
+        $admin = false;
+        
+        //Set this to "true" to publicly show the banner!
+        $showBanner = true;
+        // -- $showBanner = false;
+        
+        if($user->usertype == "Super Administrator" || $user->usertype == "Administrator")
+            { $admin = true; }
+
+        if ($admin)
+        {
+            require_once(JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner'.DS.'banner.php');
+            Banner::displayAdminLink();
+        }
+
+        if ($admin || $showBanner)
+        {
+            require_once(JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner'.DS.'banner.php');
+            Banner::displayTodayBanners(JRequest::getInt('id')); //Get the categoryID, and show all banners in that category
+        }
+?>
+
+
+
+
+
 <div id="eventlist" class="el_categoryevents">
 <p class="buttons">
 	<?php
@@ -52,32 +85,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	<p style="font-size:11px;">Klicka i texten för mer information</p>
 </div>
 </div>
-
-
-<?php //ANDREAS RENBERG 2010 
-        $user =& JFactory::getUser();
-        $admin = false;
-        
-        //Set this to "true" to publicly show the banner!
-        // -- $showBanner = true;
-        $showBanner = false;
-        
-        if($user->usertype == "Super Administrator" || $user->usertype == "Administrator")
-            { $admin = true; }
-
-        if ($admin)
-        {
-            require_once(JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner'.DS.'banner.php');
-            Banner::displayAdminLink();
-        }
-
-        if ($admin || $showBanner)
-        {
-            require_once(JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner'.DS.'banner.php');
-            Banner::displayTodayBanners(JRequest::getInt('id')); //Get the categoryID, and show all banners in that category
-        }
-?>
-
 
 <!--table-->
 
