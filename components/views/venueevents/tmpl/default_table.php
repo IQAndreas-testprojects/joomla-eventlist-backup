@@ -128,7 +128,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
   			<tr class="sectiontableentry<?php echo ($row->odd +1 ) . $this->params->get( 'pageclass_sfx' ); ?>" >
 
     			<td headers="el_date" align="left">
-    				<strong>
+    				
     					<?php echo ELOutput::formatdate($row->dates, $row->times); ?>
     					
     					<?php
@@ -136,7 +136,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
     						echo ' - '.ELOutput::formatdate($row->enddates, $row->endtimes);
     					endif;
     					?>
-    				</strong>
+    			
 
 					<?php
 					if ($this->elsettings->showtime == 1) :

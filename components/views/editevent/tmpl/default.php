@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * @version 1.0 $Id: default.php 958 2009-02-02 17:23:05Z julienv $
  * @package Joomla
@@ -88,7 +88,8 @@ defined('_JEXEC') or die('Restricted access');
    				alert("<?php echo JText::_( 'DATE WRONG', true ); ?>");
    				form.dates.focus();
    				return false;
-  			} else if ( validator.validate(form.enddates) === false ) {
+  			} 
+  			else if ( validator.validate(form.enddates) === false ) {
   				alert("<?php echo JText::_( 'DATE WRONG', true ); ?>");
   				form.enddates.focus();
   				return false;
@@ -186,7 +187,7 @@ defined('_JEXEC') or die('Restricted access');
                   <?php echo JText::_( 'TITLE' ).':'; ?>
               </label>
 
-              <input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->row->title); ?>" size="65" maxlength="60" />
+              <input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->row->title); ?>" size="80" maxlength="250" />
           </div>
 
           <div class="el_venue floattext">
@@ -333,7 +334,8 @@ defined('_JEXEC') or die('Restricted access');
               <div id="counter_row" style="display:none;">
                   <label for="recurrence_counter"><?php echo JText::_( 'RECURRENCE COUNTER' ); ?>:</label>
                   <div class="el_date>"><?php echo JHTML::_('calendar', ($this->row->recurrence_counter <> 0000-00-00) ? $this->row->recurrence_counter : JText::_( 'UNLIMITED' ), "recurrence_counter", "recurrence_counter"); ?>
-              	    <a href="#" onclick="include_unlimited('<?php echo JText::_( 'UNLIMITED' ); ?>'); return false;"><img src="components/com_eventlist/assets/images/unlimited.png" width="16" height="16" alt="<?php echo JText::_( 'UNLIMITED' ); ?>" /></a>
+              	    <a href="#" onclick="include_unlimited('<?php echo JText::_( 'UNLIMITED' ); ?>'); return false;">
+					<img src="../components/com_eventlist/assets/images/unlimited.png" width="16" height="16" alt="<?php echo JText::_( 'UNLIMITED' ); ?>" /></a>
               	</div>
               </div>
           </div>

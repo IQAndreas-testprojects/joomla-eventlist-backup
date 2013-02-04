@@ -176,8 +176,13 @@ class EventListModelCategoryevents extends JModel
 		$where		= $this->_buildCategoryWhere();
 		$orderby	= $this->_buildCategoryOrderBy();
 
+		// ***********************************
+		// 	Andreas Renberg - Nov 2009
+		// Added second line to query to include recurrence data for view.html.php file
+		
 		//Get Events from Database
 		$query = 'SELECT a.id AS eventid, a.dates, a.enddates, a.times, a.endtimes, a.title, a.locid, a.datdescription, a.created, l.id, l.venue, l.city, l.state, l.url, c.catname, c.id AS catid, '
+				. ' a.recurrence_number, a.recurrence_type, a.recurrence_counter, '
 				. ' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as slug,'
 				. ' CASE WHEN CHAR_LENGTH(l.alias) THEN CONCAT_WS(\':\', a.locid, l.alias) ELSE a.locid END as venueslug,'
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
@@ -187,6 +192,9 @@ class EventListModelCategoryevents extends JModel
 				. $where
 				. $orderby
 				;
+				
+		// 	END Andread Renberg		
+		// ***********************************
 
 		return $query;
 	}

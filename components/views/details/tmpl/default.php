@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * @version 1.0 $Id: default.php 958 2009-02-02 17:23:05Z julienv $
  * @package Joomla
@@ -32,30 +32,48 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	<h1 class="componentheading">
 		<?php echo $this->params->get('page_title'); ?>
 	</h1>
+	
 <?php endif; ?>
+
 
 <!-- Details EVENT -->
 	<h2 class="eventlist">
+	<p>
 		<?php
     	echo JText::_( 'EVENT' );
     	echo '&nbsp;'.ELOutput::editbutton($this->item->id, $this->row->did, $this->params, $this->allowedtoeditevent, 'editevent' );
     	?>
+    </p>
 	</h2>
 
 	<?php //flyer
 	echo ELOutput::flyer( $this->row, $this->dimage, 'event' );
 	?>
-
+	
+<table width="100%" cellpadding="5" cellspacing="0" border="0">
 	<dl class="event_info floattext">
+	<tr>
+	
 
 		<?php if ($this->elsettings->showdetailstitle == 1) : ?>
+		<td valign="top">
 			<dt class="title"><?php echo JText::_( 'TITLE' ).':'; ?></dt>
+		</td>
+		<td width="380" valign="top">
     		<dd class="title"><?php echo $this->escape($this->row->title); ?></dd>
+    	</td>
 		<?php
   		endif;
   		?>
+  	</tr>
+  	<tr>
+  		<td valign="top">
   		<dt class="when"><?php echo JText::_( 'WHEN' ).':'; ?></dt>
-		<dd class="when">
+  		</td>
+  		<td width="380" valign="top">
+		<dd class="when"><div align="left">
+
+
 			<?php
 			echo ELOutput::formatdate($this->row->dates, $this->row->times);
     					
@@ -72,53 +90,64 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				endif;
 			endif;
 			?>
-		</dd>
+		
+		</div></dd>
   		<?php
   		if ($this->row->locid != 0) :
   		?>
-		    <dt class="where"><?php echo JText::_( 'WHERE' ).':'; ?></dt>
+  		
+  		</td>
+  	</tr>
+  	<tr>
+  		<td valign="top">
+		    <dt class="where"><?php echo JText::_( 'WHERE' ).':'; ?>
+		    <p><?php echo ELOutput::editbutton($this->item->id, $this->row->locid, $this->params, $this->allowedtoeditvenue, 'editvenue' ); ?></p>
+		    </dt>
+		</td>
+		<td width="380" valign="top" align="left">
 		    <dd class="where">
-    		<?php if (($this->elsettings->showdetlinkvenue == 1) && (!empty($this->row->url))) : ?>
-
-			    <a href="<?php echo $this->row->url; ?>"><?php echo $this->escape($this->row->venue); ?></a> -
-
-			<?php elseif ($this->elsettings->showdetlinkvenue == 2) : ?>
-
-			    <a href="<?php echo JRoute::_( 'index.php?view=venueevents&id='.$this->row->venueslug ); ?>"><?php echo $this->row->venue; ?></a> -
-
+		    <div align="left">
+		    <a href="<?php echo JRoute::_( 'index.php?view=venueevents&id='.$this->row->venueslug ); ?>"><?php echo $this->row->venue; ?> - information</a><br />
+    		<?php if (($this->elsettings->showdetlinkvenue == 1) && (!empty($this->row->url))) : ?>   
+			    <a href="<?php echo $this->row->url; ?>"><?php echo $this->escape($this->row->venue); ?> - webbsida</a>
+				</div><br />
 			<?php elseif ($this->elsettings->showdetlinkvenue == 0) :
 
 				echo $this->escape($this->row->venue).' - ';
 
 			endif;
 
-			echo $this->escape($this->row->city); ?>
+			 ?>
 
 			</dd>
-
+		</td>
 		<?php endif; ?>
 
-		<dt class="category"><?php echo JText::_( 'CATEGORY' ).':'; ?></dt>
+		<!--dt class="category"><?php echo JText::_( 'CATEGORY' ).':'; ?></dt>
     		<dd class="category">
 				<?php echo "<a href='".JRoute::_( 'index.php?view=categoryevents&id='.$this->row->categoryslug )."'>".$this->escape($this->row->catname)."</a>";?>
-			</dd>
+			</dd-->
 	</dl>
-
-
+	</tr>
+</table>
   	<?php if ($this->elsettings->showevdescription == 1) : ?>
 
-  	    <h2 class="description"><?php echo JText::_( 'DESCRIPTION' ); ?></h2>
+		
+  	    	<h2 class="description"><?php echo JText::_( 'DESCRIPTION' ); ?></h2>
+  	 
+  	
   		<div class="description event_desc">
   			<?php echo $this->row->datdescription; ?>
   		</div>
-
+		
+	
   	<?php endif; ?>
 
 <!--  	Venue  -->
 
 	<?php if ($this->row->locid != 0) : ?>
 
-		<h2 class="location">
+		<!--h2 class="location">
 			<?php echo JText::_( 'VENUE' ) ; ?>
   			<?php echo ELOutput::editbutton($this->item->id, $this->row->locid, $this->params, $this->allowedtoeditvenue, 'editvenue' ); ?>
 		</h2>
@@ -182,7 +211,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			<?php
 			endif;
 			?>
-		</dl>
+		</dl-->
 
 		<?php if ($this->elsettings->showlocdescription == 1) :	?>
 

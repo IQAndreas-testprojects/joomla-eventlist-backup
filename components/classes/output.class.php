@@ -211,10 +211,14 @@ class ELOutput {
 				$output = '<a href="#" onclick="window.print();return false;">'.$image.'</a>';
 			} else {
 				//button in view
-				$overlib = JText::_( 'PRINT TIP' );
+				
+            //ANDREAS RENBERG - NOV 2009
+            //Two "Skriv ut" showed up at once, so I removed one of them.
+				//$overlib = JText::_( 'PRINT TIP' ); ANDREAS
 				$text = JText::_( 'Print' );
 
 				$output	= '<a href="'. JRoute::_($print_link) .'" class="editlinktip hasTip" onclick="window.open(this.href,\'win2\',\''.$status.'\'); return false;" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+
 			}
 
 			return $output;

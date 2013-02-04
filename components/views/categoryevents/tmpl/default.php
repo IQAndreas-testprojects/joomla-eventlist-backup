@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * @version 1.0 $Id: default.php 958 2009-02-02 17:23:05Z julienv $
  * @package Joomla
@@ -39,16 +39,17 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
     <h1 class='componentheading'>
 		<?php echo $this->task == 'archive' ? $this->escape($this->category->catname.' - '.JText::_('ARCHIVE')) : $this->escape($this->category->catname); ?>
 	</h1>
-
+	
 <?php endif; ?>
 
 <div class="floattext">
-<div class="catimg">
+<!--div class="catimg">
 	<?php echo $this->category->image; ?>
-</div>
+</div-->
 
 <div class="catdescription">
 	<?php echo $this->catdescription; ?>
+	<p style="font-size:11px;">Klicka i texten för mer information</p>
 </div>
 </div>
 <!--table-->
@@ -63,7 +64,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <input type="hidden" name="id" value="<?php echo $this->category->id; ?>" />
 <input type="hidden" name="Itemid" value="<?php echo $this->item->id;?>" />
 </p>
-</form>
+
 
 <!--pagination-->
 

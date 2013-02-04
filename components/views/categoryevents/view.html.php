@@ -167,6 +167,10 @@ class EventListViewCategoryevents extends JView
 	/**
 	 * Manipulate Data
 	 *
+	 * *************************************************************************************
+	 * HEAVY modifications by Andreas Renberg, including adding extra functions at the end
+	 * November 2009
+	 *
 	 * @since 0.9
 	 */
 	function &getRows()
@@ -177,15 +181,65 @@ class EventListViewCategoryevents extends JView
 			return;
 		}
 		
+		$recurrences = array();
+		$maxDate = "0000-00-00";
+		
 		$k = 0;
 		foreach($this->rows as $key => $row)
 		{
 			$row->odd   = $k;
 			
+			if (($row->recurrence_number != "0") && ($row->recurrence_type != "0"))
+			{
+				//Push the key into the array, and use it later instead
+				$recurrences[] = $key;
+			}
+			
+			$maxDate = $row->dates;
+			
 			$this->rows[$key] = $row;
 			$k = 1 - $k;
 		}
-
+		
+		//Now, push the new rows into the array!!
+		foreach($recurrences as $idnum)
+		{
+			
+			//This variable contains the newest value of the row that is pushed
+			//It begins as the original row
+			$cloneRow = $this->rows[$idnum]; 
+			$cloneRow = $this->clone_array($cloneRow); 
+			$cloneRow = $this->next_date($cloneRow); 
+			
+			$maxCounter = 0;
+			
+			while ((($cloneRow->dates <= $cloneRow->recurrence_counter) || ($cloneRow->recurrence_counter == "0000-00-00")) 
+					&& ($maxCounter <= 10)
+					&& ($cloneRow->dates <= $maxDate))
+			{
+				//Save the clone to the array
+				$this->rows[] = $cloneRow;
+				
+				//Now get the next one
+				$cloneRow = $this->next_date($this->clone_array($cloneRow));
+				
+				$maxCounter++;
+			}
+			
+		}
+		
+		
+		function cmp($a, $b)
+		{
+			if ($a->dates == $b->dates) {
+				return 0;
+			}
+			return ($a->dates < $b->dates) ? -1 : 1;
+		}		
+		
+		//Now, sort the rows on the date
+		usort($this->rows, "cmp");
+		
 		return $this->rows;
 	}
 
@@ -211,5 +265,112 @@ class EventListViewCategoryevents extends JView
 
 		return $lists;
 	}
+	
+	
+// *********************************************
+//    Andreas Renberg - Nov 2009
+//  Function taken from helper.php
+
+	/**
+	 * this methode calculate the next date
+	 */
+	function next_date($recurrence_row) {
+		// get the recurrence information
+		$recurrence_number = $recurrence_row->recurrence_number;
+		$recurrence_type = $recurrence_row->recurrence_type;
+
+		$day_time = 86400;	// 60 sec. * 60 min. * 24 h
+		$week_time = 604800;// $day_time * 7days
+		$date_array = ELHelper::generate_date($recurrence_row->dates, $recurrence_row ->enddates);
+
+
+		switch($recurrence_type) {
+			case "1":
+				// +1 hour for the Summer to Winter clock change
+				$start_day = mktime(1,0,0,$date_array["month"],$date_array["day"],$date_array["year"]);
+				$start_day = $start_day + ($recurrence_number * $day_time);
+				break;
+			case "2":
+				// +1 hour for the Summer to Winter clock change
+				$start_day = mktime(1,0,0,$date_array["month"],$date_array["day"],$date_array["year"]);
+				$start_day = $start_day + ($recurrence_number * $week_time);
+				break;
+			case "3":
+				$start_day = mktime(1,0,0,($date_array["month"] + $recurrence_number),$date_array["day"],$date_array["year"]);;
+				break;
+			default:
+				$weekday_must = ($recurrence_row->recurrence_type - 3);	// the 'must' weekday
+				if ($recurrence_number < 5) {	// 1. - 4. week in a month
+					// the first day in the new month
+					$start_day = mktime(1,0,0,($date_array["month"] + 1),1,$date_array["year"]);
+					$weekday_is = date("w",$start_day);							// get the weekday of the first day in this month
+
+					// calculate the day difference between these days
+					if ($weekday_is <= $weekday_must) {
+						$day_diff = $weekday_must - $weekday_is;
+					} else {
+						$day_diff = ($weekday_must + 7) - $weekday_is;
+					}
+					$start_day = ($start_day + ($day_diff * $day_time)) + ($week_time * ($recurrence_number - 1));
+				} else {	// the last or the before last week in a month
+					// the last day in the new month
+					$start_day = mktime(1,0,0,($date_array["month"] + 2),1,$date_array["year"]) - $day_time;
+					$weekday_is = date("w",$start_day);
+					// calculate the day difference between these days
+					if ($weekday_is >= $weekday_must) {
+						$day_diff = $weekday_is - $weekday_must;
+					} else {
+						$day_diff = ($weekday_is - $weekday_must) + 7;
+					}
+					$start_day = ($start_day - ($day_diff * $day_time));
+					if ($recurrence_number == 6) {	// before last?
+						$start_day = $start_day - $week_time;
+					}
+				}
+				break;
+		}
+		$recurrence_row->dates = date("Y-m-d", $start_day);
+		if ($recurrence_row->enddates) {
+			$recurrence_row->enddates = date("Y-m-d", $start_day + $date_array["day_diff"]);
+		}
+		return $recurrence_row;
+	}
+	
+	
+	
+	function generate_date($startdate, $enddate) {
+		$startdate = explode("-",$startdate);
+		$date_array = array("year" => $startdate[0],
+							"month" => $startdate[1],
+							"day" => $startdate[2],
+							"weekday" => date("w",mktime(1,0,0,$startdate[1],$startdate[2],$startdate[0])));
+		if ($enddate) {
+			$enddate = explode("-", $enddate);
+			$day_diff = (mktime(1,0,0,$enddate[1],$enddate[2],$enddate[0]) - mktime(1,0,0,$startdate[1],$startdate[2],$startdate[0]));
+			$date_array["day_diff"] = $day_diff;
+		}
+		return $date_array;
+	}
+	
+	
+	function clone_array($arrIn)
+	{
+		//Initialize the out variable
+		$arrOut;// = new object();
+		
+		foreach($arrIn as $inKey => $inValue)
+		{
+			//$arrOut[$inKey] = $inValue;
+			//$arrOut->{$inKey} = unserialize(serialize($inValue));
+			$arrOut->{$inKey} = $inValue;
+		}
+		
+		return $arrOut;
+	}
+
+//    END Andreas Renberg
+// *********************************************
+
+	
 }
 ?>

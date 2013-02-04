@@ -35,6 +35,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php if ($this->params->def('show_page_title', 1)) : ?>
 	<h1 class='componentheading'>
 		<?php echo $this->escape($this->pagetitle); ?>
+		
 	</h1>
 <?php endif; ?>
 
@@ -43,6 +44,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	echo ELOutput::flyer( $this->venue, $this->limage );
 	echo ELOutput::mapicon( $this->venue );
 	?>
+	
 
 	<dl class="location floattext">
 		<?php if (($this->elsettings->showdetlinkvenue == 1) && (!empty($this->venue->url))) : ?>
@@ -52,7 +54,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			</dd>
 		<?php endif; ?>
 
-		<?php if ( $this->elsettings->showdetailsadress == 1 ) : ?>
+		<!--?php if ( $this->elsettings->showdetailsadress == 1 ) : ?-->
 
   			<?php if ( $this->venue->street ) : ?>
   			<dt class="venue_street"><?php echo JText::_( 'STREET' ).':'; ?></dt>
@@ -88,21 +90,21 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
     			<?php echo $this->venue->countryimg ? $this->venue->countryimg : $this->venue->country; ?>
     		</dd>
     		<?php endif; ?>
-		<?php
+		<!--?php
 		endif; //showdetails ende
-		?>
+		?-->
 	</dl>
 
-	<?php
+	<!--?php
   	if ($this->elsettings->showlocdescription == 1) :
-	?>
+	?-->
 
 		<h2 class="description"><?php echo JText::_( 'DESCRIPTION' ); ?></h2>
 	  	<div class="description no_space floattext">
 	  		<?php echo $this->venuedescription;	?>
 		</div>
-
-	<?php endif; ?>
+		<p> &nbsp;</p>
+	<!--?php endif; ?-->
 
 	<!--table-->
 
