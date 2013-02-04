@@ -1,0 +1,90 @@
+﻿table.dagens {
+				width:520px;
+				height:200px;
+				margin:0;
+				padding:0;
+				background: url(dagens.jpg) 0 0 no-repeat;
+				border:0;
+}
+img.dagens {
+				max-width:140px;
+				max-height:155px;
+				float:left;
+}
+h1.dagens  {
+				font:14px arial,helvetica,sans-serif;
+				color: #000000;
+				font-weight:normal;
+				text-transform:none;
+				padding-bottom:15px;
+}
+h2.dagens  {
+				font: 12px arial,helvetica,sans-serif;
+				color: #000000;
+				font-weight:normal;
+				text-transform:none;
+}
+h6.dagens  {
+				font: 12px arial,helvetica,sans-serif;
+				color: #000000;
+				font-weight:normal;
+				text-transform:none;
+}
+tr.head {
+				height: 25px;
+				margin:0;
+				padding:0;
+}
+td.spacer {
+				width:4px;
+				margin:0;
+				padding:0;
+}
+td.left_head {
+				width:152px;
+				font: 9px arial, helvetica, sans-serif;
+				color:#ffffff;
+				font-weight:bold;
+				padding-left:6px;
+}
+td.right_head {
+				width:338px;
+				font: 14px arial,helvetica,sans-serif;
+				color:#ffffff;
+				text-transform:uppercase;
+				padding-right:6px;
+}
+tr.annons {
+				height:155px;
+				margin:0;
+				padding:0;
+}
+tr.footer {
+				height:20px;
+				margin:0;
+				padding:0;
+}
+td.left_footer {
+				width:152px;
+				font: 10px arial, helvetica, sans-serif;
+				color:#ffffff;
+				font-weight:bold;
+				padding-left:6px;
+}
+td.right_footer {
+				width:338px;
+				font: 11px arial,helvetica,sans-serif;
+				color:#ffffff;
+				padding-right:6px;
+}
+textarea.alt_lunch {
+				font: 12px arial,helvetica,sans-serif;
+				color: #000000;
+				font-weight:normal;
+}
+tr.odd {
+				background: #e0e0e0;
+}
+.old {
+				color: #999999;
+}

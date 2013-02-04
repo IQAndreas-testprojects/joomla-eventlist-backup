@@ -30,19 +30,62 @@ require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'output.class.php');
 //perform cleanup if it wasn't done today (archive, delete, recurrence)
 ELHelper::cleanup();
 
-// Set the table directory
-JTable::addIncludePath(JPATH_COMPONENT_ADMINISTRATOR.DS.'tables');
 
-// Require the controller
-require_once (JPATH_COMPONENT.DS.'controller.php');
+// ANDREAS RENBERG May 2010
+// If the script calls for the banner to be modified,
+// Hijack this code, and go do the banner modifications instead.
+// Modified all the code until the end
 
-// Create the controller
-$classname  = 'EventListController';
-$controller = new $classname( );
 
-// Perform the Request task
-$controller->execute( JRequest::getVar('task', null, 'default', 'cmd') );
+$task = JRequest::getCmd("task");
+$next_page = "";
 
-// Redirect if set by the controller
-$controller->redirect();
+//As a speed optimization, don't switch the task
+//or even import unless the task is actually set
+if ($task)
+{
+
+    switch ($task)
+    {
+        case "edit_banner" :
+            require_once(JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner'.DS.'banner_actions.php');
+            $next_page = BannerActions::editBanner();
+            break;
+            
+        case "banner_admin" :
+            require_once(JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner'.DS.'banner_admin.php');
+            $next_page = BannerAdmin::editBanners();
+            break;
+
+        default :
+            //NADA
+            break;
+    }
+}
+
+if (strlen($next_page))
+{
+    //Load whatever page is required next
+    require_once($next_page);
+}
+else    //RESUME NORMAL ACTIVITY
+{
+
+    // Set the table directory
+    JTable::addIncludePath(JPATH_COMPONENT_ADMINISTRATOR.DS.'tables');
+
+    // Require the controller
+    require_once (JPATH_COMPONENT.DS.'controller.php');
+
+    // Create the controller
+    $classname  = 'EventListController';
+    $controller = new $classname( );
+
+    // Perform the Request task
+    $controller->execute( JRequest::getVar('task', null, 'default', 'cmd') );
+
+    // Redirect if set by the controller
+    $controller->redirect();
+
+}
 ?>

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * @version 1.0 $Id: default.php 958 2009-02-02 17:23:05Z julienv $
  * @package Joomla
@@ -39,18 +39,46 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
     <h1 class='componentheading'>
 		<?php echo $this->task == 'archive' ? $this->escape($this->category->catname.' - '.JText::_('ARCHIVE')) : $this->escape($this->category->catname); ?>
 	</h1>
-
+	
 <?php endif; ?>
 
 <div class="floattext">
-<div class="catimg">
+<!--div class="catimg">
 	<?php echo $this->category->image; ?>
-</div>
+</div-->
 
 <div class="catdescription">
 	<?php echo $this->catdescription; ?>
+	<p style="font-size:11px;">Klicka i texten för mer information</p>
 </div>
 </div>
+
+
+<?php //ANDREAS RENBERG 2010 
+        $user =& JFactory::getUser();
+        $admin = false;
+        
+        //Set this to "true" to publicly show the banner!
+        // -- $showBanner = true;
+        $showBanner = false;
+        
+        if($user->usertype == "Super Administrator" || $user->usertype == "Administrator")
+            { $admin = true; }
+
+        if ($admin)
+        {
+            require_once(JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner'.DS.'banner.php');
+            Banner::displayAdminLink();
+        }
+
+        if ($admin || $showBanner)
+        {
+            require_once(JPATH_BASE.DS.'components'.DS.'com_eventlist'.DS.'banner'.DS.'banner.php');
+            Banner::displayTodayBanners(JRequest::getInt('id')); //Get the categoryID, and show all banners in that category
+        }
+?>
+
+
 <!--table-->
 
 <?php echo $this->loadTemplate('table'); ?>
@@ -63,7 +91,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <input type="hidden" name="id" value="<?php echo $this->category->id; ?>" />
 <input type="hidden" name="Itemid" value="<?php echo $this->item->id;?>" />
 </p>
-</form>
+
 
 <!--pagination-->
 
